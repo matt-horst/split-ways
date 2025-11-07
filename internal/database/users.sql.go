@@ -55,11 +55,11 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, username, hashed_password, created_at, updated_at FROM users
-WHERE id = $1
+WHERE username = $1
 `
 
-func (q *Queries) GetUserByUsername(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByUsername, id)
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -73,7 +73,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, id uuid.UUID) (User, er
 
 const updatePassword = `-- name: UpdatePassword :one
 UPDATE users
-SET hashed_password = $2
+SET hashed_password = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING id, username, hashed_password, created_at, updated_at
 `
