@@ -11,16 +11,11 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 
+	"github.com/matt-horst/split-ways/handlers"
 	"github.com/matt-horst/split-ways/internal/database"
 
 	_ "github.com/lib/pq"
 )
-
-type config struct {
-	db     *database.Queries
-	store  *sessions.CookieStore
-	jwtKey string
-}
 
 func main() {
 	err := godotenv.Load(".env")
@@ -50,17 +45,17 @@ func main() {
 
 	db := database.New(dbConn)
 
-	cfg := &config{
-		db:     db,
-		store:  sessions.NewCookieStore([]byte(sessionKey)),
-		jwtKey: jwtKey,
+	cfg := &handlers.Config{
+		Db:     db,
+		Store:  sessions.NewCookieStore([]byte(sessionKey)),
+		JwtKey: jwtKey,
 	}
 
 	var _ = cfg
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/healthcheck", handleHealthCheck)
+	router.HandleFunc("/api/healthcheck", handlers.HandlerHealthCheck)
 
 	srv := &http.Server{
 		Handler:      router,
@@ -71,10 +66,6 @@ func main() {
 
 	err = srv.ListenAndServe()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-}
-
-func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
 }
