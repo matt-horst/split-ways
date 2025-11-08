@@ -33,7 +33,7 @@ type Payment struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	GroupDi   uuid.NullUUID
+	GroupID   uuid.NullUUID
 	CreatedBy uuid.NullUUID
 	PaidBy    uuid.NullUUID
 	PaidTo    uuid.NullUUID

@@ -166,27 +166,6 @@ func (q *Queries) GetExpensesByGroup(ctx context.Context, groupID uuid.UUID) ([]
 	return items, nil
 }
 
-const getUserBalanceByGroup = `-- name: GetUserBalanceByGroup :one
-SELECT users_groups.group_id AS group_id, SUM(payments.amount) - SUM(splits.amount) AS balance FROM splits
-INNER JOIN expenses ON splits.expense_id = expenses.id
-INNER JOIN users_groups ON expenses.group_id = users_groups.group_id
-INNER JOIN payments ON payments.group_id = users_groups.group_id AND payments.paid_to = $1
-WHERE users_groups.user_id = $1
-GROUP BY users_groups.group_id
-`
-
-type GetUserBalanceByGroupRow struct {
-	GroupID uuid.UUID
-	Balance int32
-}
-
-func (q *Queries) GetUserBalanceByGroup(ctx context.Context, paidTo uuid.NullUUID) (GetUserBalanceByGroupRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserBalanceByGroup, paidTo)
-	var i GetUserBalanceByGroupRow
-	err := row.Scan(&i.GroupID, &i.Balance)
-	return i, err
-}
-
 const updateExpense = `-- name: UpdateExpense :one
 UPDATE expenses
 SET paid_by = $2, description = $3, amount = $4, updated_at = NOW()

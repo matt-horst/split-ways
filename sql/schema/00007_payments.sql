@@ -4,7 +4,7 @@ CREATE TABLE payments (
     id UUID PRIMARY KEY,
     created_at TIME NOT NULL,
     updated_at TIME NOT NULL,
-    group_di UUID REFERENCES groups(id) ON DELETE CASCADE,
+    group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     paid_by UUID REFERENCES users(id) ON DELETE SET NULL,
     paid_to UUID REFERENCES users(id) ON DELETE SET NULL,
