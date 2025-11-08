@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/matt-horst/split-ways/internal/auth"
@@ -46,8 +47,14 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "unique") && strings.Contains(err.Error(), "username") {
+			log.Printf("Couldn't create new user: %v\n", err)
+			http.Error(w, "Username taken", http.StatusBadRequest)
+			return
+		}
+
 		log.Printf("Couldn't create new user: %v\n", err)
-		http.Error(w, "Username taken", http.StatusBadRequest)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -58,19 +65,9 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := cfg.Store.Get(r, "user-session")
+	err = auth.SetBearerToken(cfg.Store, w, r, token)
 	if err != nil {
-		log.Printf("Couldn't get session: %v\n", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	session.Values["token"] = token
-	err = session.Save(r, w)
-	if err != nil {
-		log.Printf("Couldn't save session:L %v\n", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
+		log.Printf("Couldn't set bearer token: %v\n", err)
 	}
 
 	w.WriteHeader(http.StatusNoContent)
