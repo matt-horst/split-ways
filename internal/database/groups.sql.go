@@ -12,19 +12,25 @@ import (
 )
 
 const createGroup = `-- name: CreateGroup :one
-INSERT INTO groups (id, name, created_at, updated_at)
-VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW())
-RETURNING id, name, created_at, updated_at
+INSERT INTO groups (id, name, created_at, updated_at, owner)
+VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW(), $2)
+RETURNING id, name, created_at, updated_at, owner
 `
 
-func (q *Queries) CreateGroup(ctx context.Context, name string) (Group, error) {
-	row := q.db.QueryRowContext(ctx, createGroup, name)
+type CreateGroupParams struct {
+	Name  string
+	Owner uuid.UUID
+}
+
+func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group, error) {
+	row := q.db.QueryRowContext(ctx, createGroup, arg.Name, arg.Owner)
 	var i Group
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Owner,
 	)
 	return i, err
 }
@@ -33,7 +39,7 @@ const updateGroupName = `-- name: UpdateGroupName :one
 UPDATE groups
 SET name = $2, updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, created_at, updated_at, owner
 `
 
 type UpdateGroupNameParams struct {
@@ -49,6 +55,7 @@ func (q *Queries) UpdateGroupName(ctx context.Context, arg UpdateGroupNameParams
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Owner,
 	)
 	return i, err
 }

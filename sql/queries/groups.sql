@@ -1,6 +1,6 @@
 -- name: CreateGroup :one
-INSERT INTO groups (id, name, created_at, updated_at)
-VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW())
+INSERT INTO groups (id, name, created_at, updated_at, owner)
+VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW(), $2)
 RETURNING *;
 
 -- name: UpdateGroupName :one
