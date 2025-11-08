@@ -61,13 +61,17 @@ func main() {
 	router.HandleFunc("/api/users", cfg.HandlerCreateUser).Methods("POST")
 	router.Handle("/api/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerUpdateUser))).Methods("PUT")
 	router.HandleFunc("/api/login", cfg.HandlerLogin).Methods("POST")
+	router.Handle("/api/groups", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateGroup))).Methods("POST")
+	router.Handle("/api/groups/{group_id}/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroup))).Methods("POST")
+	router.Handle("api/groups/{group_id}/expenses", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateExpense))).Methods("POST")
+	router.Handle("api/groups/{group_id}/payments", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreatePayment))).Methods("POST")
+
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")
 	router.Handle("/signup", templ.Handler(pages.Signup())).Methods("GET")
 	router.Handle("/login", templ.Handler(pages.Login())).Methods("GET")
 	router.Handle("/dashboard", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerDashboard))).Methods("GET")
+
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
-	router.Handle("/api/groups/{group_id}", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroup))).Methods("POST")
-	router.Handle("/api/groups", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateGroup))).Methods("POST")
 
 	srv := &http.Server{
 		Handler:      router,

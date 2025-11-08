@@ -18,7 +18,6 @@ type Expense struct {
 	UpdatedAt   time.Time
 	PaidBy      uuid.NullUUID
 	Description string
-	Amount      string
 }
 
 type Group struct {
@@ -33,7 +32,7 @@ type Payment struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	GroupID   uuid.NullUUID
+	GroupID   uuid.UUID
 	CreatedBy uuid.NullUUID
 	PaidBy    uuid.NullUUID
 	PaidTo    uuid.NullUUID

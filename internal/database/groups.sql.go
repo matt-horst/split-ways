@@ -70,6 +70,23 @@ func (q *Queries) GetGroupsByUser(ctx context.Context, userID uuid.UUID) ([]Grou
 	return items, nil
 }
 
+const getUserGroup = `-- name: GetUserGroup :one
+SELECT id, user_id, group_id FROM users_groups
+WHERE user_id = $1 AND group_id = $2
+`
+
+type GetUserGroupParams struct {
+	UserID  uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) GetUserGroup(ctx context.Context, arg GetUserGroupParams) (UsersGroup, error) {
+	row := q.db.QueryRowContext(ctx, getUserGroup, arg.UserID, arg.GroupID)
+	var i UsersGroup
+	err := row.Scan(&i.ID, &i.UserID, &i.GroupID)
+	return i, err
+}
+
 const updateGroupName = `-- name: UpdateGroupName :one
 UPDATE groups
 SET name = $2, updated_at = NOW()

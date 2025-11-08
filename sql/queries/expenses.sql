@@ -1,5 +1,5 @@
 -- name: CreateExpense :one
-INSERT INTO expenses (id, created_at, updated_at, group_id, created_by, paid_by, description, amount)
+INSERT INTO expenses (id, created_at, updated_at, group_id, created_by, paid_by, description)
 VALUES (
     GEN_RANDOM_UUID(),
     NOW(),
@@ -7,13 +7,12 @@ VALUES (
     $1,
     $2,
     $3,
-    $4,
-    $5
+    $4
 ) RETURNING *;
 
 -- name: UpdateExpense :one
 UPDATE expenses
-SET paid_by = $2, description = $3, amount = $4, updated_at = NOW()
+SET paid_by = $2, description = $3, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
 

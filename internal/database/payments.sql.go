@@ -26,7 +26,7 @@ VALUES (
 `
 
 type CreatePaymentParams struct {
-	GroupID   uuid.NullUUID
+	GroupID   uuid.UUID
 	CreatedBy uuid.NullUUID
 	PaidBy    uuid.NullUUID
 	PaidTo    uuid.NullUUID

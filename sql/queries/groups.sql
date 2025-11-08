@@ -14,3 +14,6 @@ SELECT groups.* FROM groups
 INNER JOIN users_groups ON groups.id = users_groups.group_id
 WHERE users_groups.user_id = $1;
 
+-- name: GetUserGroup :one
+SELECT * FROM users_groups
+WHERE user_id = $1 AND group_id = $2;
