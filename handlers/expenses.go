@@ -87,7 +87,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 			database.CreateSplitParams{
 				ExpenseID: expense.ID,
 				UserID: uuid.NullUUID{
-					UUID: split.UserID,
+					UUID:  split.UserID,
 					Valid: true,
 				},
 				Amount: split.Amount,

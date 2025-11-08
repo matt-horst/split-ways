@@ -5,11 +5,19 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/matt-horst/split-ways/internal/database"
 )
+
+type exportUser struct {
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
 
 func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(userContextKey).(database.User)
@@ -106,4 +114,70 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to get users for group by unauthorized user\n")
+		http.Error(w, "User not authorized", http.StatusUnauthorized)
+		return
+	}
+
+	groupIDPath, ok := mux.Vars(r)["group_id"]
+	if !ok {
+		log.Printf("Missing group id\n")
+		http.Error(w, "Missing group id", http.StatusBadRequest)
+		return
+	}
+
+	groupID, err := uuid.Parse(groupIDPath)
+	if err != nil {
+		log.Printf("Couldn't parse group id: %v\n", err)
+		http.Error(w, "Couldn't parse group id", http.StatusBadRequest)
+		return
+	}
+
+	_, err = cfg.Db.GetUserGroup(
+		r.Context(),
+		database.GetUserGroupParams{
+			UserID:  user.ID,
+			GroupID: groupID,
+		},
+	)
+	if err != nil {
+		log.Printf("Attempt to read users for group user does not belong: %v\n", err)
+		http.Error(w, "Not member of group", http.StatusForbidden)
+		return
+	}
+
+	users, err := cfg.Db.GetUsersByGroup(
+		r.Context(),
+		groupID,
+	)
+	if err != nil {
+		log.Printf("Couldn't find group: %v\n", err)
+		http.Error(w, "Couldn't find group", http.StatusBadRequest)
+		return
+	}
+
+	sanitizedUsers := make([]exportUser, len(users))
+
+	for i, user := range users {
+		sanitizedUsers[i] = exportUser{
+			ID: user.ID,
+			Username: user.Username,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		}
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(users)
+	if err != nil {
+		log.Printf("Couldn't send response body: %v\n", err)
+		return
+	}
 }

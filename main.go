@@ -63,8 +63,9 @@ func main() {
 	router.HandleFunc("/api/login", cfg.HandlerLogin).Methods("POST")
 	router.Handle("/api/groups", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateGroup))).Methods("POST")
 	router.Handle("/api/groups/{group_id}/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroup))).Methods("POST")
-	router.Handle("api/groups/{group_id}/expenses", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateExpense))).Methods("POST")
-	router.Handle("api/groups/{group_id}/payments", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreatePayment))).Methods("POST")
+	router.Handle("/api/groups/{group_id}/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerGetGroupUsers))).Methods("GET")
+	router.Handle("/api/groups/{group_id}/expenses", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateExpense))).Methods("POST")
+	router.Handle("/api/groups/{group_id}/payments", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreatePayment))).Methods("POST")
 
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")
 	router.Handle("/signup", templ.Handler(pages.Signup())).Methods("GET")

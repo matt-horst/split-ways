@@ -87,6 +87,41 @@ func (q *Queries) GetUserGroup(ctx context.Context, arg GetUserGroupParams) (Use
 	return i, err
 }
 
+const getUsersByGroup = `-- name: GetUsersByGroup :many
+SELECT users.id, users.username, users.hashed_password, users.created_at, users.updated_at FROM users
+INNER JOIN users_groups ON users.id = users_groups.user_id
+WHERE users_groups.group_id = $1
+`
+
+func (q *Queries) GetUsersByGroup(ctx context.Context, groupID uuid.UUID) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersByGroup, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.HashedPassword,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateGroupName = `-- name: UpdateGroupName :one
 UPDATE groups
 SET name = $2, updated_at = NOW()
