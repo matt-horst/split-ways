@@ -165,8 +165,8 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 
 	for i, user := range users {
 		sanitizedUsers[i] = exportUser{
-			ID: user.ID,
-			Username: user.Username,
+			ID:        user.ID,
+			Username:  user.Username,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 		}
