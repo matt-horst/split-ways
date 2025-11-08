@@ -66,6 +66,7 @@ func main() {
 	router.Handle("/login", templ.Handler(pages.Login())).Methods("GET")
 	router.Handle("/dashboard", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerDashboard))).Methods("GET")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
+	router.Handle("/api/groups/{group_id}", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroup))).Methods("POST")
 	router.Handle("/api/groups", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateGroup))).Methods("POST")
 
 	srv := &http.Server{
