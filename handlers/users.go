@@ -1,16 +1,21 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/matt-horst/split-ways/internal/auth"
 	"github.com/matt-horst/split-ways/internal/database"
 	"github.com/matt-horst/split-ways/web/pages"
+)
+
+type contextKey string
+
+const (
+	userContextKey contextKey = "user"
 )
 
 func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +124,7 @@ func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (cfg *Config) HandlerUpdateUser(userID uuid.UUID, w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Password string `json:"password"`
 	}{}
@@ -138,8 +143,15 @@ func (cfg *Config) HandlerUpdateUser(userID uuid.UUID, w http.ResponseWriter, r 
 		return
 	}
 
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to update unauthenticated user\n")
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
 	_, err = cfg.Db.UpdatePassword(r.Context(), database.UpdatePasswordParams{
-		ID:             userID,
+		ID:             user.ID,
 		HashedPassword: hashedPassword,
 	})
 	if err != nil {
@@ -151,23 +163,23 @@ func (cfg *Config) HandlerUpdateUser(userID uuid.UUID, w http.ResponseWriter, r 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (cfg *Config) HandlerDashboard(userID uuid.UUID, w http.ResponseWriter, r *http.Request) {
-	user, err := cfg.Db.GetUserByID(r.Context(), userID)
-	if err != nil {
-		log.Printf("Couldn't find user: %v\n", err)
-		http.Error(w, "Couldn't find user", http.StatusBadRequest)
+func (cfg *Config) HandlerDashboard(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to handle dashboard with unauthenticated user\n")
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
 		return
 	}
 
-	err = pages.Dashboard(user.Username).Render(r.Context(), w)
+	err := pages.Dashboard(user.Username).Render(r.Context(), w)
 	if err != nil {
 		log.Printf("Couldn't send page: %v\n", err)
 		return
 	}
 }
 
-func (cfg *Config) UserMiddleware(fn func(uuid.UUID, http.ResponseWriter, *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) AuthenticatedUserMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := auth.GetBearerToken(cfg.Store, r)
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -180,6 +192,14 @@ func (cfg *Config) UserMiddleware(fn func(uuid.UUID, http.ResponseWriter, *http.
 			return
 		}
 
-		fn(userID, w, r)
-	}
+		user, err := cfg.Db.GetUserByID(r.Context(), userID)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, user)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }

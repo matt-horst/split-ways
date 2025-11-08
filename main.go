@@ -59,11 +59,11 @@ func main() {
 
 	router.HandleFunc("/api/healthcheck", handlers.HandlerHealthCheck)
 	router.HandleFunc("/api/users", cfg.HandlerCreateUser).Methods("POST")
-	router.HandleFunc("/api/users", cfg.UserMiddleware(cfg.HandlerUpdateUser)).Methods("PUT")
+	router.Handle("/api/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerUpdateUser))).Methods("PUT")
 	router.HandleFunc("/api/login", cfg.HandlerLogin).Methods("POST")
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")
 	router.Handle("/login", templ.Handler(pages.Login())).Methods("GET")
-	router.HandleFunc("/dashboard", cfg.UserMiddleware(cfg.HandlerDashboard)).Methods("GET")
+	router.Handle("/dashboard", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerDashboard))).Methods("GET")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 
 	srv := &http.Server{
