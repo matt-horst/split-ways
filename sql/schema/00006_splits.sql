@@ -2,6 +2,8 @@
 -- +goose StatementBegin
 CREATE TABLE splits (
     id UUID PRIMARY KEY,
+    created_at TIME NOT NULL,
+    updated_at TIME NOT NULL,
     expense_id UUID NOT NULL REFERENCES expenses(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     amount NUMERIC(12, 2) NOT NULL
