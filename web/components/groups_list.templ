@@ -1,0 +1,13 @@
+package components
+
+import (
+    "github.com/matt-horst/split-ways/internal/database"
+)
+
+templ GroupsList(groups []database.Group) {
+    <ul>
+        for _, group := range groups {
+            <li>{ group.Name }</li>
+        }
+    </ul>
+}

@@ -168,7 +168,14 @@ func (cfg *Config) HandlerDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := pages.Dashboard(user.Username).Render(r.Context(), w)
+	groups, err := cfg.Db.GetGroupsByUser(r.Context(), user.ID)
+	if err != nil {
+		log.Printf("Couldn't find groups by user: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	err = pages.Dashboard(user.Username, groups).Render(r.Context(), w)
 	if err != nil {
 		log.Printf("Couldn't send page: %v\n", err)
 		return

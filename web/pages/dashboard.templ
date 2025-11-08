@@ -1,16 +1,23 @@
 package pages
 
-templ Dashboard(username string) {
+import (
+    "github.com/matt-horst/split-ways/web/components"
+    "github.com/matt-horst/split-ways/internal/database"
+)
+
+templ Dashboard(username string, groups []database.Group) {
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SplitWays</title>
+        <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
         <main class="card" role="main">
             <h1>Welcome, { username }</h1>
+            @components.GroupsList(groups)
         </main>
     </body>
     </html>
