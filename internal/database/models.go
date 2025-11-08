@@ -10,12 +10,43 @@ import (
 	"github.com/google/uuid"
 )
 
+type Expense struct {
+	ID          uuid.UUID
+	CreatedBy   uuid.NullUUID
+	GroupID     uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	PaidBy      uuid.NullUUID
+	Description string
+	Amount      string
+}
+
 type Group struct {
 	ID        uuid.UUID
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Owner     uuid.UUID
+}
+
+type Payment struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	GroupDi   uuid.NullUUID
+	CreatedBy uuid.NullUUID
+	PaidBy    uuid.NullUUID
+	PaidTo    uuid.NullUUID
+	Amount    string
+}
+
+type Split struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ExpenseID uuid.UUID
+	UserID    uuid.NullUUID
+	Amount    string
 }
 
 type User struct {

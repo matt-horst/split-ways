@@ -35,6 +35,41 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group
 	return i, err
 }
 
+const getGroupsByUser = `-- name: GetGroupsByUser :many
+SELECT groups.id, groups.name, groups.created_at, groups.updated_at, groups.owner FROM groups
+INNER JOIN users_groups ON groups.id = users_groups.group_id
+WHERE users_groups.user_id = $1
+`
+
+func (q *Queries) GetGroupsByUser(ctx context.Context, userID uuid.UUID) ([]Group, error) {
+	rows, err := q.db.QueryContext(ctx, getGroupsByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Group
+	for rows.Next() {
+		var i Group
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Owner,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateGroupName = `-- name: UpdateGroupName :one
 UPDATE groups
 SET name = $2, updated_at = NOW()

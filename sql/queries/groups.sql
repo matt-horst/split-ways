@@ -8,3 +8,9 @@ UPDATE groups
 SET name = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: GetGroupsByUser :many
+SELECT groups.* FROM groups
+INNER JOIN users_groups ON groups.id = users_groups.group_id
+WHERE users_groups.user_id = $1;
+
