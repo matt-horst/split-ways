@@ -1,5 +1,9 @@
 package pages
 
+import (
+    "github.com/matt-horst/split-ways/web/components"
+)
+
 templ Login() {
     <!DOCTYPE html>
     <html>
@@ -7,6 +11,7 @@ templ Login() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SplitWays</title>
+        <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
         <main class="card" role="main">
@@ -16,8 +21,9 @@ templ Login() {
                 <input id="input-password" type="password" placeholder="password" required></input>
                 <button id="button-submit" type="submit">Login</button>
             </form>
+            @components.Status()
         </main>
-        <script src="/static/login.js"></script>
+        <script src="/static/login.js" type="module"></script>
     </body>
     </html>
 }
