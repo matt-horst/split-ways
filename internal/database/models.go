@@ -10,10 +10,23 @@ import (
 	"github.com/google/uuid"
 )
 
+type Group struct {
+	ID        uuid.UUID
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type User struct {
 	ID             uuid.UUID
 	Username       string
 	HashedPassword string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+}
+
+type UsersGroup struct {
+	ID      uuid.UUID
+	UserID  uuid.UUID
+	GroupID uuid.UUID
 }
