@@ -94,10 +94,34 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	_, err = cfg.Db.GetUserGroup(
+		r.Context(),
+		database.GetUserGroupParams{
+			UserID: user.ID,
+			GroupID: groupID,
+		},
+	)
+	if err != nil {
+		log.Printf("Attempt to add user to group from unauthorized user: %v\n", err)
+		http.Error(w, "User not member of group", http.StatusForbidden)
+		return
+	}
+
+	data := struct {
+		UserID uuid.UUID `json:"user_id"`
+	} {}
+
+	err = json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		log.Printf("Couldn't decode request body: %v\n", err)
+		http.Error(w, "Couldn't decode request", http.StatusBadRequest)
+		return
+	}
+
 	_, err = cfg.Db.CreateUserGroup(
 		r.Context(),
 		database.CreateUserGroupParams{
-			UserID:  user.ID,
+			UserID:  data.UserID,
 			GroupID: groupID,
 		},
 	)
@@ -105,6 +129,13 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 		if strings.Contains(err.Error(), "users_groups_group_id_fkey") {
 			log.Printf("Couldn't find group: %v\n", err)
 			http.Error(w, "Couldn't find group", http.StatusBadRequest)
+			return
+		}
+
+		// Duplicat key error
+		if strings.Contains(err.Error(), "users_groups_user_id_group_id_key") {
+			log.Printf("Couldn't add duplicate user group: %v\n", err)
+			http.Error(w, "User already in group", http.StatusBadRequest)
 			return
 		}
 
