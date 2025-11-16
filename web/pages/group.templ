@@ -1,0 +1,26 @@
+package pages
+
+import (
+    "github.com/matt-horst/split-ways/web/components"
+    "github.com/matt-horst/split-ways/internal/accounting"
+	"github.com/matt-horst/split-ways/internal/database"
+)
+
+templ Group(group database.Group, transactions []accounting.Transaction) {
+    <!DOCTYPE html>
+    <html>
+    @components.Head("SplitWays")
+    <body>
+        <main class="card" role="main">
+            <h1>{ group.Name }</h1>
+            <div class="action-bar">
+                <form action={"/groups/" + group.ID.String() + "/add-user"}><button type="submit" class="action-btn">Add User</button></form>
+                <form action={"/groups/" + group.ID.String() + "/create-expense"}><button type="submit" class="action-btn">Create Expense</button></form>
+                <form action={"/groups/" + group.ID.String() + "/create-payment"}><button type="submit" class="action-btn">Create Payment</button></form>
+            </div>
+            @components.Summary()
+            @components.TransactionsList(transactions)
+        </main>
+    </body>
+    </html>
+}
