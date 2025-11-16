@@ -1,7 +1,34 @@
 -- name: GetUserBalanceByGroup :one
-SELECT users_groups.group_id AS group_id, SUM(payments.amount) - SUM(splits.amount) AS balance FROM splits
-INNER JOIN expenses ON splits.expense_id = expenses.id
-INNER JOIN users_groups ON expenses.group_id = users_groups.group_id
-INNER JOIN payments ON payments.group_id = users_groups.group_id AND payments.paid_to = $1
-WHERE users_groups.user_id = $1
-GROUP BY users_groups.group_id;
+SELECT SUM(payments.amount) - SUM(debts.amount) AS balance FROM transactions
+INNER JOIN expenses ON transactions.id = expenses.transaction_id
+INNER JOIN debts ON expenses.id = debts.expense_id
+INNER JOIN payments ON transactions.id = payments.transaction_id
+WHERE transactions.group_id = $1
+AND debts.owed_to = $3
+AND debts.owed_by = $2
+AND payments.paid_to = $3
+AND payments.paid_by = $2;
+
+-- name: GetSumOfDebts :one
+SELECT SUM(debts.amount) AS total FROM transactions
+INNER JOIN expenses ON transactions.id = expenses.transaction_id
+INNER JOIN debts ON expenses.id = debts.expense_id
+WHERE transactions.group_id = $1 AND debts.owed_by = $2 AND debts.owed_to = $3;
+
+-- name: GetSumOfPayments :one
+SELECT SUM(debts) AS total FROM transactions
+INNER JOIN payments ON transactions.id = payments.transaction_id
+WHERE transactions.group_id = $1 AND payments.paid_by = $2 AND payments.paid_to = $3;
+
+-- name: GetExpenseByTransaction :one
+SELECT * FROM expenses
+WHERE expenses.transaction_id = $1;
+
+-- name: GetDebtsByTransaction :many
+SELECT debts.* FROM expenses
+INNER JOIN debts ON expenses.id = debts.expense_id
+WHERE expenses.transaction_id = $1;
+
+-- name: GetPaymentByTransaction :one
+SELECT payments.* FROM payments
+WHERE payments.transaction_id = $1;
