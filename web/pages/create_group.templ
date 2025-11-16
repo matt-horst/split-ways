@@ -1,0 +1,23 @@
+package pages
+
+import (
+    "github.com/matt-horst/split-ways/web/components"
+)
+
+templ CreateGroup() {
+    <!DOCTYPE html>
+    <html>
+    @components.Head("SplitWays")
+    <body>
+        <main class="card" role="main">
+            <h1>Create Group</h1>
+            <form id="form">
+                <input id="input-name" type="text" placeholder="name" required></input>
+                <button id="button-submit" type="submit">Create</button>
+            </form>
+            @components.Status()
+        </main>
+        <script src="/static/create_group.js" type="module"></script>
+    </body>
+    </html>
+}
