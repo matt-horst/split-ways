@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -47,10 +50,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 
 	data := struct {
 		Description string `json:"description"`
-		Splits      []struct {
-			UserID uuid.UUID `json:"user_id"`
-			Amount string    `json:"amount"`
-		} `json:"splits"`
+		Amount      string `json:"amount"`
 	}{}
 
 	err = json.NewDecoder(r.Body).Decode(&data)
@@ -60,19 +60,33 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	expense, err := cfg.Db.CreateExpense(
+	transaction, err := cfg.Db.CreateTransaction(
 		r.Context(),
-		database.CreateExpenseParams{
+		database.CreateTransactionParams{
 			GroupID: groupID,
 			CreatedBy: uuid.NullUUID{
 				UUID:  user.ID,
 				Valid: true,
 			},
+			Kind: "expense",
+		},
+	)
+	if err != nil {
+		log.Printf("Couldn't create transaction: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	expense, err := cfg.Db.CreateExpense(
+		r.Context(),
+		database.CreateExpenseParams{
+			TransactionID: transaction.ID,
 			PaidBy: uuid.NullUUID{
 				UUID:  user.ID,
 				Valid: true,
 			},
 			Description: data.Description,
+			Amount:      data.Amount,
 		},
 	)
 	if err != nil {
@@ -81,28 +95,44 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	for _, split := range data.Splits {
-		_, err = cfg.Db.CreateSplit(
+	users, err := cfg.Db.GetUsersByGroup(r.Context(), groupID)
+	if err != nil {
+		log.Printf("Couldn't get users in group: %v", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	amount, err := strconv.Atoi(strings.ReplaceAll(data.Amount, ".", ""))
+	if err != nil {
+		log.Printf("Couldn't convert amount to int: %v", err)
+		http.Error(w, "Couldn't parse amount", http.StatusBadRequest)
+		return
+	}
+	debtAmount := amount / (len(users) - 1)
+
+	for _, u := range users {
+		if u.ID == user.ID {
+			continue
+		}
+
+		_, err = cfg.Db.CreateDebt(
 			r.Context(),
-			database.CreateSplitParams{
+			database.CreateDebtParams{
 				ExpenseID: expense.ID,
-				UserID: uuid.NullUUID{
-					UUID:  split.UserID,
+				OwedTo: uuid.NullUUID{
+					UUID:  user.ID,
 					Valid: true,
 				},
-				Amount: split.Amount,
+				OwedBy: uuid.NullUUID{
+					UUID:  u.ID,
+					Valid: true,
+				},
+				Amount: fmt.Sprintf("%d.%d", debtAmount/100, debtAmount%100),
 			},
 		)
 		if err != nil {
 			log.Printf("Couldn't create split: %v\n", err)
 			http.Error(w, "Something went wrong", http.StatusInternalServerError)
-
-			_, err = cfg.Db.DeleteExpense(r.Context(), expense.ID)
-			if err != nil {
-				log.Printf("Couldn't clean up invalid expense: %v\n", err)
-				return
-			}
-
 			return
 		}
 	}
