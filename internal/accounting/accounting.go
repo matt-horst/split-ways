@@ -53,14 +53,14 @@ type Debt struct {
 func GetTransationsByGroup(queries *database.Queries, ctx context.Context, groupID uuid.UUID) ([]Transaction, error) {
 	dbTransactions, err := queries.GetTransactionsByGroup(ctx, groupID)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't get transactions by group: %v\n", err)
+		return nil, fmt.Errorf("couldn't get transactions by group: %v", err)
 	}
 
 	users := make(map[uuid.UUID]*User)
 
 	dbUsers, err := queries.GetUsersByGroup(ctx, groupID)
 	if err != nil {
-		return nil, fmt.Errorf("Coudln't find group: %v", err)
+		return nil, fmt.Errorf("coudln't find group: %v", err)
 	}
 
 	for _, u := range dbUsers {
@@ -81,10 +81,13 @@ func GetTransationsByGroup(queries *database.Queries, ctx context.Context, group
 		case "expense":
 			dbExpense, err := queries.GetExpenseByTransaction(ctx, dbTransaction.ID)
 			if err != nil {
-				return nil, fmt.Errorf("Couldn't find payment for transaction: %v", err)
+				return nil, fmt.Errorf("couldn't find payment for transaction: %v", err)
 			}
 
 			dbDebts, err := queries.GetDebtsByTransaction(ctx, dbTransaction.ID)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get debts for transaction: %v", err)
+			}
 
 			var paidByUser *User
 			if dbExpense.PaidBy.Valid {
@@ -135,7 +138,7 @@ func GetTransationsByGroup(queries *database.Queries, ctx context.Context, group
 		case "payment":
 			dbPayment, err := queries.GetPaymentByTransaction(ctx, dbTransaction.ID)
 			if err != nil {
-				return nil, fmt.Errorf("Couldn't find payment for transaction: %v", err)
+				return nil, fmt.Errorf("couldn't find payment for transaction: %v", err)
 			}
 
 			var paidByUser *User
@@ -167,7 +170,7 @@ func GetTransationsByGroup(queries *database.Queries, ctx context.Context, group
 				Payment:   payment,
 			}
 		default:
-			return nil, fmt.Errorf("Unknown transaction kind: %v", dbTransaction.Kind)
+			return nil, fmt.Errorf("unknown transaction kind: %v", dbTransaction.Kind)
 		}
 	}
 
@@ -193,7 +196,7 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("Couldn't get debts between users: %v\n", err)
+		return 0, fmt.Errorf("couldn't get debts between users: %v", err)
 	}
 
 	totalDebtToThis, err := queries.GetSumOfDebts(
@@ -205,7 +208,7 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("Couldn't get debts between users: %v\n", err)
+		return 0, fmt.Errorf("couldn't get debts between users: %v", err)
 	}
 
 	totalPaymentsToOther, err := queries.GetSumOfPayments(
@@ -217,7 +220,7 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("Couldn't get payments between users: %v\n", err)
+		return 0, fmt.Errorf("couldn't get payments between users: %v", err)
 	}
 
 	totalPaymentsToThis, err := queries.GetSumOfPayments(
@@ -229,7 +232,7 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("Couldn't get payments between users: %v\n", err)
+		return 0, fmt.Errorf("couldn't get payments between users: %v", err)
 	}
 
 	total := totalDebtToThis - totalDebtToOther + totalPaymentsToOther - totalPaymentsToThis
