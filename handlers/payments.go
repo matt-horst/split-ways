@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -46,9 +47,9 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 	}
 
 	data := struct {
-		PaidBy uuid.UUID `json:"paid_by"`
-		PaidTo uuid.UUID `json:"paid_to"`
-		Amount string    `json:"amount"`
+		PaidBy string `json:"paid_by"`
+		PaidTo string `json:"paid_to"`
+		Amount string `json:"amount"`
 	}{}
 
 	err = json.NewDecoder(r.Body).Decode(&data)
@@ -58,53 +59,80 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
-		r.Context(),
-		database.GetUserGroupParams{
-			UserID:  data.PaidBy,
-			GroupID: groupID,
-		},
-	)
+	paidBy, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
 	if err != nil {
-		log.Printf("Attempt to create payment paid by user not in group: %v\n", err)
-		http.Error(w, "Couldn't create payment", http.StatusBadRequest)
+		log.Printf("Couldn't find paid by user: %v\n", err)
+		http.Error(w, fmt.Sprintf("Couldn't find user `%v`", data.PaidBy), http.StatusBadRequest)
+		return
+	}
+
+	paidTo, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidTo)
+	if err != nil {
+		log.Printf("Couldn't find paid by user: %v\n", err)
+		http.Error(w, fmt.Sprintf("Couldn't find user `%v`", data.PaidTo), http.StatusBadRequest)
 		return
 	}
 
 	_, err = cfg.Db.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
-			UserID:  data.PaidTo,
+			UserID:  paidBy.ID,
+			GroupID: groupID,
+		},
+	)
+	if err != nil {
+		log.Printf("Attempt to create payment paid by user not in group: %v\n", err)
+		http.Error(w, fmt.Sprintf("User `%v` not in group", data.PaidBy), http.StatusBadRequest)
+		return
+	}
+
+	_, err = cfg.Db.GetUserGroup(
+		r.Context(),
+		database.GetUserGroupParams{
+			UserID:  paidTo.ID,
 			GroupID: groupID,
 		},
 	)
 	if err != nil {
 		log.Printf("Attempt to create payment paid to user not in group: %v\n", err)
-		http.Error(w, "Couldn't create payment", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("User `%v` not in group", data.PaidTo), http.StatusBadRequest)
+		return
+	}
+
+	transaction, err := cfg.Db.CreateTransaction(
+		r.Context(),
+		database.CreateTransactionParams{
+			GroupID: groupID,
+			CreatedBy: uuid.NullUUID{
+				UUID:  user.ID,
+				Valid: true,
+			},
+			Kind: "payment",
+		},
+	)
+	if err != nil {
+		log.Printf("Couldn't create transaction: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
 	payment, err := cfg.Db.CreatePayment(
 		r.Context(),
 		database.CreatePaymentParams{
-			GroupID: groupID,
-			CreatedBy: uuid.NullUUID{
-				UUID:  user.ID,
-				Valid: true,
-			},
+			TransactionID: transaction.ID,
 			PaidBy: uuid.NullUUID{
-				UUID:  data.PaidBy,
+				UUID:  paidBy.ID,
 				Valid: true,
 			},
 			PaidTo: uuid.NullUUID{
-				UUID:  data.PaidTo,
+				UUID:  paidTo.ID,
 				Valid: true,
 			},
 			Amount: data.Amount,
 		},
 	)
 	if err != nil {
-		log.Printf("Couldn't create expense: %v\n", err)
+		log.Printf("Couldn't create payment: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
