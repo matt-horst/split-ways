@@ -11,23 +11,137 @@ import (
 	"github.com/google/uuid"
 )
 
-const getUserBalanceByGroup = `-- name: GetUserBalanceByGroup :one
-SELECT users_groups.group_id AS group_id, SUM(payments.amount) - SUM(splits.amount) AS balance FROM splits
-INNER JOIN expenses ON splits.expense_id = expenses.id
-INNER JOIN users_groups ON expenses.group_id = users_groups.group_id
-INNER JOIN payments ON payments.group_id = users_groups.group_id AND payments.paid_to = $1
-WHERE users_groups.user_id = $1
-GROUP BY users_groups.group_id
+const getDebtsByTransaction = `-- name: GetDebtsByTransaction :many
+SELECT debts.id, debts.expense_id, debts.owed_by, debts.owed_to, debts.amount FROM expenses
+INNER JOIN debts ON expenses.id = debts.expense_id
+WHERE expenses.transaction_id = $1
 `
 
-type GetUserBalanceByGroupRow struct {
-	GroupID uuid.UUID
-	Balance int32
+func (q *Queries) GetDebtsByTransaction(ctx context.Context, transactionID uuid.UUID) ([]Debt, error) {
+	rows, err := q.db.QueryContext(ctx, getDebtsByTransaction, transactionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Debt
+	for rows.Next() {
+		var i Debt
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExpenseID,
+			&i.OwedBy,
+			&i.OwedTo,
+			&i.Amount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-func (q *Queries) GetUserBalanceByGroup(ctx context.Context, paidTo uuid.NullUUID) (GetUserBalanceByGroupRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserBalanceByGroup, paidTo)
-	var i GetUserBalanceByGroupRow
-	err := row.Scan(&i.GroupID, &i.Balance)
+const getExpenseByTransaction = `-- name: GetExpenseByTransaction :one
+SELECT id, paid_by, description, transaction_id, amount FROM expenses
+WHERE expenses.transaction_id = $1
+`
+
+func (q *Queries) GetExpenseByTransaction(ctx context.Context, transactionID uuid.UUID) (Expense, error) {
+	row := q.db.QueryRowContext(ctx, getExpenseByTransaction, transactionID)
+	var i Expense
+	err := row.Scan(
+		&i.ID,
+		&i.PaidBy,
+		&i.Description,
+		&i.TransactionID,
+		&i.Amount,
+	)
 	return i, err
+}
+
+const getPaymentByTransaction = `-- name: GetPaymentByTransaction :one
+SELECT payments.id, payments.paid_by, payments.paid_to, payments.amount, payments.transaction_id FROM payments
+WHERE payments.transaction_id = $1
+`
+
+func (q *Queries) GetPaymentByTransaction(ctx context.Context, transactionID uuid.UUID) (Payment, error) {
+	row := q.db.QueryRowContext(ctx, getPaymentByTransaction, transactionID)
+	var i Payment
+	err := row.Scan(
+		&i.ID,
+		&i.PaidBy,
+		&i.PaidTo,
+		&i.Amount,
+		&i.TransactionID,
+	)
+	return i, err
+}
+
+const getSumOfDebts = `-- name: GetSumOfDebts :one
+SELECT SUM(debts.amount) AS total FROM transactions
+INNER JOIN expenses ON transactions.id = expenses.transaction_id
+INNER JOIN debts ON expenses.id = debts.expense_id
+WHERE transactions.group_id = $1 AND debts.owed_by = $2 AND debts.owed_to = $3
+`
+
+type GetSumOfDebtsParams struct {
+	GroupID uuid.UUID
+	OwedBy  uuid.NullUUID
+	OwedTo  uuid.NullUUID
+}
+
+func (q *Queries) GetSumOfDebts(ctx context.Context, arg GetSumOfDebtsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getSumOfDebts, arg.GroupID, arg.OwedBy, arg.OwedTo)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
+}
+
+const getSumOfPayments = `-- name: GetSumOfPayments :one
+SELECT SUM(debts) AS total FROM transactions
+INNER JOIN payments ON transactions.id = payments.transaction_id
+WHERE transactions.group_id = $1 AND payments.paid_by = $2 AND payments.paid_to = $3
+`
+
+type GetSumOfPaymentsParams struct {
+	GroupID uuid.UUID
+	PaidBy  uuid.NullUUID
+	PaidTo  uuid.NullUUID
+}
+
+func (q *Queries) GetSumOfPayments(ctx context.Context, arg GetSumOfPaymentsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getSumOfPayments, arg.GroupID, arg.PaidBy, arg.PaidTo)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
+}
+
+const getUserBalanceByGroup = `-- name: GetUserBalanceByGroup :one
+SELECT SUM(payments.amount) - SUM(debts.amount) AS balance FROM transactions
+INNER JOIN expenses ON transactions.id = expenses.transaction_id
+INNER JOIN debts ON expenses.id = debts.expense_id
+INNER JOIN payments ON transactions.id = payments.transaction_id
+WHERE transactions.group_id = $1
+AND debts.owed_to = $3
+AND debts.owed_by = $2
+AND payments.paid_to = $3 
+AND payments.paid_by = $2
+`
+
+type GetUserBalanceByGroupParams struct {
+	GroupID uuid.UUID
+	OwedBy  uuid.NullUUID
+	OwedTo  uuid.NullUUID
+}
+
+func (q *Queries) GetUserBalanceByGroup(ctx context.Context, arg GetUserBalanceByGroupParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, getUserBalanceByGroup, arg.GroupID, arg.OwedBy, arg.OwedTo)
+	var balance int32
+	err := row.Scan(&balance)
+	return balance, err
 }

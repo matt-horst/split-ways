@@ -7,13 +7,14 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 const createGroup = `-- name: CreateGroup :one
-INSERT INTO groups (id, name, created_at, updated_at, owner)
-VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW(), $2)
+INSERT INTO groups (name, owner)
+VALUES ($1, $2)
 RETURNING id, name, created_at, updated_at, owner
 `
 
@@ -24,6 +25,24 @@ type CreateGroupParams struct {
 
 func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group, error) {
 	row := q.db.QueryRowContext(ctx, createGroup, arg.Name, arg.Owner)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Owner,
+	)
+	return i, err
+}
+
+const getGroup = `-- name: GetGroup :one
+SELECT id, name, created_at, updated_at, owner FROM groups
+WHERE id = $1
+`
+
+func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (Group, error) {
+	row := q.db.QueryRowContext(ctx, getGroup, id)
 	var i Group
 	err := row.Scan(
 		&i.ID,
@@ -56,6 +75,56 @@ func (q *Queries) GetGroupsByUser(ctx context.Context, userID uuid.UUID) ([]Grou
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Owner,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getOtherUsersInGroup = `-- name: GetOtherUsersInGroup :many
+SELECT users_groups.group_id AS group_id, users.id, users.username, users.hashed_password, users.created_at, users.updated_at FROM users
+INNER JOIN users_groups ON users.id = users_groups.user_id
+WHERE group_id = $1 AND users.id != $2
+`
+
+type GetOtherUsersInGroupParams struct {
+	GroupID uuid.UUID
+	ID      uuid.UUID
+}
+
+type GetOtherUsersInGroupRow struct {
+	GroupID        uuid.UUID
+	ID             uuid.UUID
+	Username       string
+	HashedPassword string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) GetOtherUsersInGroup(ctx context.Context, arg GetOtherUsersInGroupParams) ([]GetOtherUsersInGroupRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOtherUsersInGroup, arg.GroupID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOtherUsersInGroupRow
+	for rows.Next() {
+		var i GetOtherUsersInGroupRow
+		if err := rows.Scan(
+			&i.GroupID,
+			&i.ID,
+			&i.Username,
+			&i.HashedPassword,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
