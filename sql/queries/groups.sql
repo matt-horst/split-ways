@@ -1,6 +1,6 @@
 -- name: CreateGroup :one
-INSERT INTO groups (id, name, created_at, updated_at, owner)
-VALUES (GEN_RANDOM_UUID(), $1, NOW(), NOW(), $2)
+INSERT INTO groups (name, owner)
+VALUES ($1, $2)
 RETURNING *;
 
 -- name: UpdateGroupName :one
@@ -8,6 +8,10 @@ UPDATE groups
 SET name = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: GetGroup :one
+SELECT * FROM groups
+WHERE id = $1;
 
 -- name: GetGroupsByUser :many
 SELECT groups.* FROM groups
@@ -22,3 +26,8 @@ WHERE user_id = $1 AND group_id = $2;
 SELECT users.* FROM users
 INNER JOIN users_groups ON users.id = users_groups.user_id
 WHERE users_groups.group_id = $1;
+
+-- name: GetOtherUsersInGroup :many
+SELECT users_groups.group_id AS group_id, users.* FROM users
+INNER JOIN users_groups ON users.id = users_groups.user_id
+WHERE group_id = $1 AND users.id != $2;
