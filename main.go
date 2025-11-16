@@ -74,6 +74,11 @@ func main() {
 	router.Handle("/signup", templ.Handler(pages.Signup())).Methods("GET")
 	router.Handle("/login", templ.Handler(pages.Login())).Methods("GET")
 	router.Handle("/dashboard", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerDashboard))).Methods("GET")
+	router.Handle("/groups/{group_id}", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerGroupPage))).Methods("GET")
+	router.Handle("/create-group", cfg.AuthenticatedUserMiddleware(templ.Handler(pages.CreateGroup())))
+	router.Handle("/groups/{group_id}/add-user", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroupPage)))
+	router.Handle("/groups/{group_id}/create-expense", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateExpensePage)))
+	router.Handle("/groups/{group_id}/create-payment", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreatePaymentPage)))
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 
