@@ -33,7 +33,15 @@ func Signup() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>SplitWays</title><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body><main class=\"card\" role=\"main\"><h1>Signup</h1><form id=\"form\"><input id=\"input-username\" type=\"text\" placeholder=\"username\" required> <input id=\"input-password\" type=\"password\" placeholder=\"password\" required> <button id=\"button-submit\" type=\"submit\">Submit</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = components.Head("SplitWays").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<body><main class=\"card\" role=\"main\"><h1>Signup</h1><form id=\"form\"><input id=\"input-username\" type=\"text\" placeholder=\"username\" required> <input id=\"input-password\" type=\"password\" placeholder=\"password\" required> <button id=\"button-submit\" type=\"submit\">Submit</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -41,7 +49,7 @@ func Signup() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</main><script src=\"/static/signup.js\" type=\"module\"></script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><script src=\"/static/signup.js\" type=\"module\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
