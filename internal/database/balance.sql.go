@@ -129,7 +129,7 @@ INNER JOIN payments ON transactions.id = payments.transaction_id
 WHERE transactions.group_id = $1
 AND debts.owed_to = $3
 AND debts.owed_by = $2
-AND payments.paid_to = $3 
+AND payments.paid_to = $3
 AND payments.paid_by = $2
 `
 

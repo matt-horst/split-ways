@@ -131,6 +131,16 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
+const deleteTransaction = `-- name: DeleteTransaction :exec
+DELETE FROM transactions
+WHERE id = $1
+`
+
+func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteTransaction, id)
+	return err
+}
+
 const getExpensesByGroup = `-- name: GetExpensesByGroup :many
 SELECT expenses.id, expenses.paid_by, expenses.description, expenses.transaction_id, expenses.amount FROM expenses
 INNER JOIN transactions ON expenses.transaction_id = transactions.id
@@ -221,6 +231,25 @@ func (q *Queries) GetPaymentsByGroup(ctx context.Context, groupID uuid.UUID) ([]
 		return nil, err
 	}
 	return items, nil
+}
+
+const getTransaction = `-- name: GetTransaction :one
+SELECT id, created_at, updated_at, created_by, group_id, kind FROM transactions
+WHERE id = $1
+`
+
+func (q *Queries) GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, getTransaction, id)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CreatedBy,
+		&i.GroupID,
+		&i.Kind,
+	)
+	return i, err
 }
 
 const getTransactionsByGroup = `-- name: GetTransactionsByGroup :many

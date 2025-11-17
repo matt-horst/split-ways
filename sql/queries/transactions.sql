@@ -25,10 +25,18 @@ INSERT INTO transactions (group_id, created_by, kind)
 VALUES ($1, $2, $3)
 RETURNING *;
 
+-- name: GetTransaction :one
+SELECT * FROM transactions
+WHERE id = $1;
+
 -- name: GetTransactionsByGroup :many
 SELECT * FROM transactions
 WHERE group_id = $1
 ORDER BY updated_at;
+
+-- name: DeleteTransaction :exec
+DELETE FROM transactions
+WHERE id = $1;
 
 -- name: CreatePayment :one
 INSERT INTO payments (transaction_id, paid_by, paid_to, amount)
