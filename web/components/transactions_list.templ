@@ -40,7 +40,9 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
                                 paidBy = t.Expense.PaidBy.Username
                             }
                         }}
-                        { paidBy } paid ${ t.Expense.Amount } \for { t.Expense.Description }
+                        { paidBy } spent
+                        &nbsp;<span class="amount negative">${ t.Expense.Amount.String() }</span>&nbsp;
+                        on { t.Expense.Description }
                     case accounting.PaymentKind:
                         {{ 
                             paidBy := "Deleted User"
@@ -53,7 +55,8 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
                                 paidTo = t.Payment.PaidTo.Username
                             }
                         }}
-                        { paidBy } paid { paidTo } ${ t.Payment.Amount }
+                        { paidBy } paid { paidTo }
+                        &nbsp;<span class="amount positive">${ t.Payment.Amount.String() }</span>&nbsp;
                     default:
                         Unknown type: { t.Kind } (expecting: {accounting.ExpenseKind} or {accounting.PaymentKind})
                     }

@@ -14,7 +14,7 @@ import (
 	"github.com/matt-horst/split-ways/web/components"
 )
 
-func Group(user database.User, group database.Group, transactions []accounting.Transaction) templ.Component {
+func Group(user database.User, group database.Group, transactions []accounting.Transaction, balances []accounting.Balance) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -99,7 +99,7 @@ func Group(user database.User, group database.Group, transactions []accounting.T
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Summary().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Summary(balances).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

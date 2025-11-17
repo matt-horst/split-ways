@@ -1,5 +1,77 @@
 package components
 
-templ Summary() {
-    <div></div>
+import (
+	"github.com/matt-horst/split-ways/internal/accounting"
+	"github.com/shopspring/decimal"
+)
+
+templ owedIcon() {
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+	>
+		<path d="M12 3v14"></path>
+		<path d="M6 11l6 6 6-6"></path>
+		<rect x="3" y="3" width="18" height="14" rx="2"></rect>
+	</svg>
+}
+
+templ oweIcon() {
+	<svg
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+	>
+		<path d="M12 21V7"></path>
+		<path d="M6 13l6-6 6 6"></path>
+		<rect x="3" y="7" width="18" height="14" rx="2"></rect>
+	</svg>
+}
+
+templ Summary(balances []accounting.Balance) {
+	<section class="summary card">
+		<h2>Summary</h2>
+		<ul class="summary-list">
+			for _, b := range balances {
+				{{
+					cmp := b.Amount.Compare(decimal.NewFromInt(0))
+					isOwed := cmp > 0
+					isEven := cmp == 0
+				}}
+				if !isEven {
+					<li class="summary-item">
+						<div class="summary-icon">
+							if isOwed {
+								@owedIcon()
+							} else {
+								@oweIcon()
+							}
+						</div>
+						<span class="summary-text">
+							if isOwed {
+								You are owed
+								&nbsp;<span class="amount positive">${ b.Amount.Abs().String() }</span>&nbsp;
+								from { b.Other.Username }
+							} else {
+								You owe
+								&nbsp;<span class="amount negative">${ b.Amount.Abs().String() }</span>&nbsp;
+								to { b.Other.Username }
+							}
+						</span>
+					</li>
+				}
+			}
+		</ul>
+	</section>
 }

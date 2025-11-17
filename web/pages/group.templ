@@ -6,7 +6,7 @@ import (
 	"github.com/matt-horst/split-ways/internal/database"
 )
 
-templ Group(user database.User, group database.Group, transactions []accounting.Transaction) {
+templ Group(user database.User, group database.Group, transactions []accounting.Transaction, balances []accounting.Balance) {
     <!DOCTYPE html>
     <html>
     @components.Head("SplitWays")
@@ -18,7 +18,7 @@ templ Group(user database.User, group database.Group, transactions []accounting.
                 <form action={"/groups/" + group.ID.String() + "/create-expense"}><button type="submit" class="action-btn">Create Expense</button></form>
                 <form action={"/groups/" + group.ID.String() + "/create-payment"}><button type="submit" class="action-btn">Create Payment</button></form>
             </div>
-            @components.Summary()
+            @components.Summary(balances)
             @components.TransactionsList(user, transactions)
         </main>
         <script>
