@@ -69,6 +69,7 @@ func main() {
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerAddUserToGroup).Methods("POST")
 	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerCreateExpense).Methods("POST")
 	groups.HandleFunc("/{group_id}/payments", cfg.HandlerCreatePayment).Methods("POST")
+	groups.HandleFunc("/{group_id}/transactions", cfg.HandlerDeleteTransaction).Methods("DELETE")
 
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")
 	router.Handle("/signup", templ.Handler(pages.Signup())).Methods("GET")
