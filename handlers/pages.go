@@ -203,5 +203,5 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.Handler(pages.Group(group, txs)).ServeHTTP(w, r)
+	templ.Handler(pages.Group(user, group, txs)).ServeHTTP(w, r)
 }
