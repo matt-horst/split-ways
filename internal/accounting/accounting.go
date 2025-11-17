@@ -3,10 +3,12 @@ package accounting
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/shopspring/decimal"
 )
 
 type TransactionKind string
@@ -32,22 +34,22 @@ type Transaction struct {
 }
 
 type Payment struct {
-	PaidBy *User  `json:"paid_by"`
-	PaidTo *User  `json:"paid_to"`
-	Amount string `json:"amount"`
+	PaidBy *User           `json:"paid_by"`
+	PaidTo *User           `json:"paid_to"`
+	Amount decimal.Decimal `json:"amount"`
 }
 
 type Expense struct {
-	Description string `json:"description"`
-	PaidBy      *User  `json:"paid_by"`
-	Amount      string `json:"amount"`
-	Debts       []Debt `json:"debts"`
+	Description string          `json:"description"`
+	PaidBy      *User           `json:"paid_by"`
+	Amount      decimal.Decimal `json:"amount"`
+	Debts       []Debt          `json:"debts"`
 }
 
 type Debt struct {
-	Amount string `json:"amount"`
-	OwedBy *User  `json:"owed_by"`
-	OwedTo *User  `json:"owed_to"`
+	Amount decimal.Decimal `json:"amount"`
+	OwedBy *User           `json:"owed_by"`
+	OwedTo *User           `json:"owed_to"`
 }
 
 func GetTransationsByGroup(queries *database.Queries, ctx context.Context, groupID uuid.UUID) ([]Transaction, error) {
@@ -177,7 +179,41 @@ func GetTransationsByGroup(queries *database.Queries, ctx context.Context, group
 	return transactions, nil
 }
 
-func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, groupID, thisUserID, otherUserID uuid.UUID) (int64, error) {
+type Balance struct {
+	Other  User
+	Amount decimal.Decimal
+}
+
+func GetBalanceForGroup(queries *database.Queries, ctx context.Context, groupID, userId uuid.UUID) ([]Balance, error) {
+	users, err := queries.GetUsersByGroup(ctx, groupID)
+	if err != nil {
+		return nil, fmt.Errorf("coudln't find users in group: %v", err)
+	}
+
+	balances := make([]Balance, len(users)-1)
+	i := 0
+	for _, user := range users {
+		if user.ID == userId {
+			continue
+		}
+
+		b, err := GetBalanceBetweenUsers(queries, ctx, groupID, userId, user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		balances[i] = Balance{
+			Other:  User{ID: user.ID, Username: user.Username},
+			Amount: b,
+		}
+
+		i++
+	}
+
+	return balances, nil
+}
+
+func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, groupID, thisUserID, otherUserID uuid.UUID) (decimal.Decimal, error) {
 	thisUserNullID := uuid.NullUUID{
 		UUID:  thisUserID,
 		Valid: true,
@@ -196,7 +232,9 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("couldn't get debts between users: %v", err)
+		if !strings.Contains(err.Error(), "NULL") {
+			return decimal.Decimal{}, fmt.Errorf("couldn't get debts between users: %v", err)
+		}
 	}
 
 	totalDebtToThis, err := queries.GetSumOfDebts(
@@ -208,7 +246,9 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("couldn't get debts between users: %v", err)
+		if !strings.Contains(err.Error(), "NULL") {
+			return decimal.Decimal{}, fmt.Errorf("couldn't get debts between users: %v", err)
+		}
 	}
 
 	totalPaymentsToOther, err := queries.GetSumOfPayments(
@@ -220,7 +260,9 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("couldn't get payments between users: %v", err)
+		if !strings.Contains(err.Error(), "NULL") {
+			return decimal.Decimal{}, fmt.Errorf("couldn't get payments between users: %v", err)
+		}
 	}
 
 	totalPaymentsToThis, err := queries.GetSumOfPayments(
@@ -232,10 +274,12 @@ func GetBalanceBetweenUsers(queries *database.Queries, ctx context.Context, grou
 		},
 	)
 	if err != nil {
-		return 0, fmt.Errorf("couldn't get payments between users: %v", err)
+		if !strings.Contains(err.Error(), "NULL") {
+			return decimal.Decimal{}, fmt.Errorf("couldn't get payments between users: %v", err)
+		}
 	}
 
-	total := totalDebtToThis - totalDebtToOther + totalPaymentsToOther - totalPaymentsToThis
+	total := totalDebtToThis.Sub(totalDebtToOther).Add(totalPaymentsToOther).Sub(totalPaymentsToThis)
 
 	return total, nil
 }
