@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) {
@@ -47,9 +48,9 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 	}
 
 	data := struct {
-		PaidBy string `json:"paid_by"`
-		PaidTo string `json:"paid_to"`
-		Amount string `json:"amount"`
+		PaidBy string          `json:"paid_by"`
+		PaidTo string          `json:"paid_to"`
+		Amount decimal.Decimal `json:"amount"`
 	}{}
 
 	err = json.NewDecoder(r.Body).Decode(&data)

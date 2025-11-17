@@ -2,15 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) {
@@ -49,8 +47,8 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 	}
 
 	data := struct {
-		Description string `json:"description"`
-		Amount      string `json:"amount"`
+		Description string          `json:"description"`
+		Amount      decimal.Decimal `json:"amount"`
 	}{}
 
 	err = json.NewDecoder(r.Body).Decode(&data)
@@ -102,13 +100,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	amount, err := strconv.Atoi(strings.ReplaceAll(data.Amount, ".", ""))
-	if err != nil {
-		log.Printf("Couldn't convert amount to int: %v", err)
-		http.Error(w, "Couldn't parse amount", http.StatusBadRequest)
-		return
-	}
-	debtAmount := amount / (len(users) - 1)
+	debtAmount := data.Amount.Div(decimal.NewFromInt(int64(len(users))))
 
 	for _, u := range users {
 		if u.ID == user.ID {
@@ -127,7 +119,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 					UUID:  u.ID,
 					Valid: true,
 				},
-				Amount: fmt.Sprintf("%d.%d", debtAmount/100, debtAmount%100),
+				Amount: debtAmount,
 			},
 		)
 		if err != nil {

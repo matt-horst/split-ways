@@ -196,6 +196,13 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bs, err := accounting.GetBalanceForGroup(cfg.Db, r.Context(), groupID, user.ID)
+	if err != nil {
+		log.Printf("Couldn't get balance for group: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
 	group, err := cfg.Db.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
@@ -203,5 +210,5 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.Handler(pages.Group(user, group, txs)).ServeHTTP(w, r)
+	templ.Handler(pages.Group(user, group, txs, bs)).ServeHTTP(w, r)
 }
