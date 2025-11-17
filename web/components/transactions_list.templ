@@ -17,18 +17,22 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
                         <path d="M4 2h12l4 4v16l-4-2-4 2-4-2-4 2V2z" />
                         <path d="M8 10h8" />
                         <path d="M8 14h5" />
-                    </svg>
+                        </svg>
                 case accounting.PaymentKind:
                     <svg class="tx-icon payment-icon" width="20" height="20" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14" />
-                        <polyline points="13 6 19 12 13 18" />
-                        <circle cx="6" cy="12" r="2" />
-                    </svg>
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <!-- outer bill -->
+                        <rect x="2.5" y="6.5" width="19" height="11" rx="2" ry="2"></rect>
+                        <!-- inner border -->
+                        <rect x="5" y="9" width="14" height="6" rx="1" ry="1"></rect>
+                        <!-- dollar sign -->
+                        <path d="M12 10.25v3.5"></path>
+                        <path d="M11 9.5c0 .7 1 .7 1 0 0-.7-1-.7-1 0z"></path>
+                        <path d="M12 14.5c0-.7-1-.7-1 0 0 .7 1 .7 1 0z"></path>
+                        </svg>
                 }
                 <span class="transaction-text">
-                    switch t.Kind {
+                switch t.Kind {
                     case accounting.ExpenseKind:
                         {{
                             paidBy := "Deleted User" 

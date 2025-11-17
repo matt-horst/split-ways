@@ -204,6 +204,9 @@ button:active {
 
 .payment-icon {
   color: #80ffea; /* aqua */
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .transaction-main {
