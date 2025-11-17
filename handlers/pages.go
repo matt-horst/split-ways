@@ -7,8 +7,8 @@ import (
 	"github.com/a-h/templ"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/matt-horst/split-ways/internal/database"
 	"github.com/matt-horst/split-ways/internal/accounting"
+	"github.com/matt-horst/split-ways/internal/database"
 	"github.com/matt-horst/split-ways/web/pages"
 )
 

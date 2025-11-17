@@ -219,4 +219,3 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
-
