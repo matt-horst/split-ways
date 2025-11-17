@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Debt struct {
@@ -15,7 +16,7 @@ type Debt struct {
 	ExpenseID uuid.UUID
 	OwedBy    uuid.NullUUID
 	OwedTo    uuid.NullUUID
-	Amount    string
+	Amount    decimal.Decimal
 }
 
 type Expense struct {
@@ -23,7 +24,7 @@ type Expense struct {
 	PaidBy        uuid.NullUUID
 	Description   string
 	TransactionID uuid.UUID
-	Amount        string
+	Amount        decimal.Decimal
 }
 
 type Group struct {
@@ -38,7 +39,7 @@ type Payment struct {
 	ID            uuid.UUID
 	PaidBy        uuid.NullUUID
 	PaidTo        uuid.NullUUID
-	Amount        string
+	Amount        decimal.Decimal
 	TransactionID uuid.UUID
 }
 

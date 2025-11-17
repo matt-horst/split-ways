@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createDebt = `-- name: CreateDebt :one
@@ -22,7 +23,7 @@ type CreateDebtParams struct {
 	ExpenseID uuid.UUID
 	OwedTo    uuid.NullUUID
 	OwedBy    uuid.NullUUID
-	Amount    string
+	Amount    decimal.Decimal
 }
 
 func (q *Queries) CreateDebt(ctx context.Context, arg CreateDebtParams) (Debt, error) {
@@ -53,7 +54,7 @@ type CreateExpenseParams struct {
 	TransactionID uuid.UUID
 	PaidBy        uuid.NullUUID
 	Description   string
-	Amount        string
+	Amount        decimal.Decimal
 }
 
 func (q *Queries) CreateExpense(ctx context.Context, arg CreateExpenseParams) (Expense, error) {
@@ -84,7 +85,7 @@ type CreatePaymentParams struct {
 	TransactionID uuid.UUID
 	PaidBy        uuid.NullUUID
 	PaidTo        uuid.NullUUID
-	Amount        string
+	Amount        decimal.Decimal
 }
 
 func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (Payment, error) {
@@ -188,7 +189,7 @@ type GetPaymentsByGroupRow struct {
 	ID            uuid.UUID
 	PaidBy        uuid.NullUUID
 	PaidTo        uuid.NullUUID
-	Amount        string
+	Amount        decimal.Decimal
 	TransactionID uuid.UUID
 	ID_2          uuid.UUID
 	CreatedAt     time.Time
@@ -323,7 +324,7 @@ RETURNING id, paid_by, paid_to, amount, transaction_id
 
 type UpdatePaymentParams struct {
 	ID     uuid.UUID
-	Amount string
+	Amount decimal.Decimal
 }
 
 func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) (Payment, error) {

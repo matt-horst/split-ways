@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const getDebtsByTransaction = `-- name: GetDebtsByTransaction :many
@@ -83,7 +84,7 @@ func (q *Queries) GetPaymentByTransaction(ctx context.Context, transactionID uui
 }
 
 const getSumOfDebts = `-- name: GetSumOfDebts :one
-SELECT SUM(debts.amount) AS total FROM transactions
+SELECT CAST(COALESCE(SUM(debts.amount), 0) AS NUMERIC(12, 2)) AS total FROM transactions
 INNER JOIN expenses ON transactions.id = expenses.transaction_id
 INNER JOIN debts ON expenses.id = debts.expense_id
 WHERE transactions.group_id = $1 AND debts.owed_by = $2 AND debts.owed_to = $3
@@ -95,15 +96,15 @@ type GetSumOfDebtsParams struct {
 	OwedTo  uuid.NullUUID
 }
 
-func (q *Queries) GetSumOfDebts(ctx context.Context, arg GetSumOfDebtsParams) (int64, error) {
+func (q *Queries) GetSumOfDebts(ctx context.Context, arg GetSumOfDebtsParams) (decimal.Decimal, error) {
 	row := q.db.QueryRowContext(ctx, getSumOfDebts, arg.GroupID, arg.OwedBy, arg.OwedTo)
-	var total int64
+	var total decimal.Decimal
 	err := row.Scan(&total)
 	return total, err
 }
 
 const getSumOfPayments = `-- name: GetSumOfPayments :one
-SELECT SUM(debts) AS total FROM transactions
+SELECT CAST(COALESCE(SUM(payments.amount), 0) AS NUMERIC(12, 2)) AS total FROM transactions
 INNER JOIN payments ON transactions.id = payments.transaction_id
 WHERE transactions.group_id = $1 AND payments.paid_by = $2 AND payments.paid_to = $3
 `
@@ -114,9 +115,9 @@ type GetSumOfPaymentsParams struct {
 	PaidTo  uuid.NullUUID
 }
 
-func (q *Queries) GetSumOfPayments(ctx context.Context, arg GetSumOfPaymentsParams) (int64, error) {
+func (q *Queries) GetSumOfPayments(ctx context.Context, arg GetSumOfPaymentsParams) (decimal.Decimal, error) {
 	row := q.db.QueryRowContext(ctx, getSumOfPayments, arg.GroupID, arg.PaidBy, arg.PaidTo)
-	var total int64
+	var total decimal.Decimal
 	err := row.Scan(&total)
 	return total, err
 }
