@@ -10,13 +10,13 @@ AND payments.paid_to = $3
 AND payments.paid_by = $2;
 
 -- name: GetSumOfDebts :one
-SELECT SUM(debts.amount) AS total FROM transactions
+SELECT CAST(COALESCE(SUM(debts.amount), 0) AS NUMERIC(12, 2)) AS total FROM transactions
 INNER JOIN expenses ON transactions.id = expenses.transaction_id
 INNER JOIN debts ON expenses.id = debts.expense_id
 WHERE transactions.group_id = $1 AND debts.owed_by = $2 AND debts.owed_to = $3;
 
 -- name: GetSumOfPayments :one
-SELECT SUM(debts) AS total FROM transactions
+SELECT CAST(COALESCE(SUM(payments.amount), 0) AS NUMERIC(12, 2)) AS total FROM transactions
 INNER JOIN payments ON transactions.id = payments.transaction_id
 WHERE transactions.group_id = $1 AND payments.paid_by = $2 AND payments.paid_to = $3;
 
