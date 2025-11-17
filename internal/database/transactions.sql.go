@@ -255,7 +255,7 @@ func (q *Queries) GetTransaction(ctx context.Context, id uuid.UUID) (Transaction
 const getTransactionsByGroup = `-- name: GetTransactionsByGroup :many
 SELECT id, created_at, updated_at, created_by, group_id, kind FROM transactions
 WHERE group_id = $1
-ORDER BY updated_at
+ORDER BY updated_at DESC
 `
 
 func (q *Queries) GetTransactionsByGroup(ctx context.Context, groupID uuid.UUID) ([]Transaction, error) {

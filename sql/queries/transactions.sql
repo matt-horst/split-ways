@@ -32,7 +32,7 @@ WHERE id = $1;
 -- name: GetTransactionsByGroup :many
 SELECT * FROM transactions
 WHERE group_id = $1
-ORDER BY updated_at;
+ORDER BY updated_at DESC;
 
 -- name: DeleteTransaction :exec
 DELETE FROM transactions
