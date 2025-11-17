@@ -387,3 +387,74 @@ button:active {
     color: #ff7676; /* warm red */
 }
 
+/* === Navbar === */
+.navbar {
+  width: 100%;
+  padding: 0.75rem 1.2rem;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.nav-item {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius);
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-item:hover {
+  background: #2a2a2a;
+}
+
+.nav-home {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.nav-home:hover {
+  background: #202f48;
+}
+
+.nav-signup {
+  background: var(--accent);
+  color: white;
+}
+
+.nav-signup:hover {
+  background: var(--accent-hover);
+}
+
+.nav-logout {
+  color: #ff7a7a;
+}
+
+.nav-logout:hover {
+  background: rgba(255, 90, 90, 0.15);
+}
+
+/* Icons */
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  opacity: 0.85;
+}
+

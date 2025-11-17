@@ -11,6 +11,7 @@ templ Dashboard(username string, groups []database.Group) {
     @components.Head("SplitWays")
     <body>
         <main class="card" role="main">
+            @components.Navbar(true)
             <h1>Welcome, { username }</h1>
             @components.GroupsList(groups)
         </main>

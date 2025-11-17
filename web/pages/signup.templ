@@ -1,24 +1,23 @@
 package pages
 
-import (
-    "github.com/matt-horst/split-ways/web/components"
-)
+import "github.com/matt-horst/split-ways/web/components"
 
 templ Signup() {
-    <!DOCTYPE html>
-    <html>
-    @components.Head("SplitWays")
-    <body>
-        <main class="card" role="main">
-            <h1>Signup</h1>
-            <form id="form">
-                <input id="input-username" type="text" placeholder="username" required></input>
-                <input id="input-password" type="password" placeholder="password" required></input>
-                <button id="button-submit" type="submit">Submit</button>
-            </form>
-            @components.Status()
-        </main>
-        <script src="/static/signup.js" type="module"></script>
-    </body>
-    </html>
+	<!DOCTYPE html>
+	<html>
+		@components.Head("SplitWays")
+		<body>
+			<main class="card" role="main">
+				@components.Navbar(false)
+				<h1>Signup</h1>
+				<form id="form">
+					<input id="input-username" type="text" placeholder="username" required/>
+					<input id="input-password" type="password" placeholder="password" required/>
+					<button id="button-submit" type="submit">Submit</button>
+				</form>
+				@components.Status()
+			</main>
+			<script src="/static/signup.js" type="module"></script>
+		</body>
+	</html>
 }

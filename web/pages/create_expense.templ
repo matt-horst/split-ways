@@ -1,28 +1,29 @@
 package pages
 
 import (
-    "github.com/matt-horst/split-ways/web/components"
 	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/matt-horst/split-ways/web/components"
 )
 
 templ CreateExpense(group database.Group) {
-    <!DOCTYPE html>
-    <html>
-    @components.Head("SplitWays")
-    <body>
-        <main class="card" role="main">
-            <h1>Create Expense</h1>
-            <form id="form">
-                <input id="input-amount" type="text" placeholder="$0.00" required></input>
-                <input id="input-description" type="text" placeholder="description..." required></input>
-                <button id="button-submit" type="submit">Create</button>
-            </form>
-            @components.Status()
-        </main>
-        <script>
+	<!DOCTYPE html>
+	<html>
+		@components.Head("SplitWays")
+		<body>
+			<main class="card" role="main">
+				@components.Navbar(true)
+				<h1>Create Expense</h1>
+				<form id="form">
+					<input id="input-amount" type="text" placeholder="$0.00" required/>
+					<input id="input-description" type="text" placeholder="description..." required/>
+					<button id="button-submit" type="submit">Create</button>
+				</form>
+				@components.Status()
+			</main>
+			<script>
             const groupID = "{{ group.ID }}"
         </script>
-        <script src="/static/create_expense.js" type="module"></script>
-    </body>
-    </html>
+			<script src="/static/create_expense.js" type="module"></script>
+		</body>
+	</html>
 }

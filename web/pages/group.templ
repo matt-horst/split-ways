@@ -1,30 +1,31 @@
 package pages
 
 import (
-    "github.com/matt-horst/split-ways/web/components"
-    "github.com/matt-horst/split-ways/internal/accounting"
+	"github.com/matt-horst/split-ways/internal/accounting"
 	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/matt-horst/split-ways/web/components"
 )
 
 templ Group(user database.User, group database.Group, transactions []accounting.Transaction, balances []accounting.Balance) {
-    <!DOCTYPE html>
-    <html>
-    @components.Head("SplitWays")
-    <body>
-        <main class="card" role="main">
-            <h1>{ group.Name }</h1>
-            <div class="action-bar">
-                <form action={"/groups/" + group.ID.String() + "/add-user"}><button type="submit" class="action-btn">Add User</button></form>
-                <form action={"/groups/" + group.ID.String() + "/create-expense"}><button type="submit" class="action-btn">Create Expense</button></form>
-                <form action={"/groups/" + group.ID.String() + "/create-payment"}><button type="submit" class="action-btn">Create Payment</button></form>
-            </div>
-            @components.Summary(balances)
-            @components.TransactionsList(user, transactions)
-        </main>
-        <script>
+	<!DOCTYPE html>
+	<html>
+		@components.Head("SplitWays")
+		<body>
+			<main class="card" role="main">
+				@components.Navbar(true)
+				<h1>{ group.Name }</h1>
+				<div class="action-bar">
+					<form action={ "/groups/" + group.ID.String() + "/add-user" }><button type="submit" class="action-btn">Add User</button></form>
+					<form action={ "/groups/" + group.ID.String() + "/create-expense" }><button type="submit" class="action-btn">Create Expense</button></form>
+					<form action={ "/groups/" + group.ID.String() + "/create-payment" }><button type="submit" class="action-btn">Create Payment</button></form>
+				</div>
+				@components.Summary(balances)
+				@components.TransactionsList(user, transactions)
+			</main>
+			<script>
             const groupID = "{{ group.ID.String() }}"
         </script>
-        <script src="/static/group.js" type="module"></script>
-    </body>
-    </html>
+			<script src="/static/group.js" type="module"></script>
+		</body>
+	</html>
 }
