@@ -61,6 +61,7 @@ func main() {
 	router.HandleFunc("/api/users", cfg.HandlerCreateUser).Methods("POST")
 	router.Handle("/api/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerUpdateUser))).Methods("PUT")
 	router.HandleFunc("/api/login", cfg.HandlerLogin).Methods("POST")
+	router.HandleFunc("/api/logout", cfg.HandlerLogout).Methods("POST")
 
 	groups := router.NewRoute().PathPrefix("/api/groups").Subrouter()
 	groups.Use(cfg.AuthenticatedUserMiddleware)
@@ -74,6 +75,7 @@ func main() {
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")
 	router.Handle("/signup", templ.Handler(pages.Signup())).Methods("GET")
 	router.Handle("/login", templ.Handler(pages.Login())).Methods("GET")
+	router.Handle("/logout", templ.Handler(pages.Logout())).Methods("GET")
 	router.Handle("/dashboard", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerDashboard))).Methods("GET")
 	router.Handle("/groups/{group_id}", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerGroupPage))).Methods("GET")
 	router.Handle("/create-group", cfg.AuthenticatedUserMiddleware(templ.Handler(pages.CreateGroup())))

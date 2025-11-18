@@ -121,6 +121,24 @@ func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (cfg *Config) HandlerLogout(w http.ResponseWriter, r *http.Request) {
+	session, err := cfg.Store.Get(r, "user-session")
+	if err != nil {
+		log.Printf("Couldn't get cookie store: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusBadRequest)
+		return
+	}
+
+	session.Options.MaxAge = -1
+	if err := session.Save(r, w); err != nil {
+		log.Printf("Couldn't revoke user-session cookie: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (cfg *Config) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Password string `json:"password"`
