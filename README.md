@@ -41,3 +41,5 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 - [ ] Add style to the list of users in add user page
 - [ ] Add way to specify how the expense should be split
 - [ ] Add dates to the transaction list
+- [ ] Setup logging middleware
+- [ ] Setup sqlc in CI

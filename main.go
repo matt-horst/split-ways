@@ -103,6 +103,9 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
+
+	fmt.Printf("Now listening on %s!\n", srv.Addr)
+
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatalln(err)
