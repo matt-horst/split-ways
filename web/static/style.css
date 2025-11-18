@@ -483,3 +483,69 @@ button:active {
 .button-accent:active {
   transform: translateY(0);
 }
+
+/* === Members Section === */
+.members-section {
+  margin-bottom: 1.5rem;
+}
+
+.members-section h2 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  background: #1b1b1d;
+  border: 1px solid #2a2a2c;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.member-item:hover {
+  background: #242427;
+  border-color: #343437;
+}
+
+.member-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2d2d31;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.7rem;
+}
+
+.member-avatar svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text-muted);
+  opacity: 0.9;
+}
+
+.member-name {
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 1.5rem 0;
+}

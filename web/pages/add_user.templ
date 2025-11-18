@@ -5,6 +5,20 @@ import (
 	"github.com/matt-horst/split-ways/web/components"
 )
 
+templ userIcon() {
+	<svg
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+	>
+		<circle cx="12" cy="7" r="4"></circle>
+		<path d="M5.5 21c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path>
+	</svg>
+}
+
 templ AddUser(group database.Group, currentUser database.User, members []database.User) {
 	<!DOCTYPE html>
 	<html>
@@ -14,17 +28,20 @@ templ AddUser(group database.Group, currentUser database.User, members []databas
 				@components.Navbar(true)
 				<h1>Add User</h1>
 				<h2>{ group.Name }</h2>
-				<h2>Existing Members</h2>
-				<ul>
-					for _, user := range members {
-						<li>
-							{ user.Username }
-							if user.ID == currentUser.ID {
-								(you)
-							}
-						</li>
-					}
-				</ul>
+				<section class="members-section">
+					<h2>Existing Members</h2>
+					<ul class="members-list">
+						for _, user := range members {
+							<li class="member-item">
+								<div class="member-avatar">
+									@userIcon()
+								</div>
+								<span class="member-name">{ user.Username }</span>
+							</li>
+						}
+					</ul>
+				</section>
+				<hr class="divider"/>
 				<form id="form">
 					<input id="input-username" type="text" placeholder="username" required/>
 					<button id="button-submit" type="submit">Add</button>
