@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -23,6 +25,11 @@ func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Couldn't load ENV file: %v\n", err)
+	}
+
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "8080"
 	}
 
 	dbConnStr, ok := os.LookupEnv("DATABASE")
@@ -47,13 +54,17 @@ func main() {
 
 	db := database.New(dbConn)
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	if err := dbConn.PingContext(ctx); err != nil {
+		log.Fatalf("Couldn't establish database connection: %v\n", err)
+	}
+	cancel()
+
 	cfg := &handlers.Config{
 		Db:     db,
 		Store:  sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey: jwtKey,
 	}
-
-	var _ = cfg
 
 	router := mux.NewRouter()
 
@@ -87,7 +98,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         ":8080",
+		Addr:         fmt.Sprintf(":%s", port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

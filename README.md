@@ -3,7 +3,7 @@ A web based appliction to track household expenses for a group similar to [split
 
 ## Setup
 ### .env
-Create a `.env` file with keys for the desired `PORT`, `DATABASE` connection string, and `JWT_SECRET`. The hostname will default to `localhost`; the port will default to `8080`; the database connection string and JWT secret are required.
+Create a `.env` file with keys for the desired `PORT`, `DATABASE` connection string, and `JWT_SECRET`. The port will default to `8080`; the database connection string and JWT secret are required.
 
 ### Database Migrations
 Database migrations are intended to be run automaticall by [goose](https://github.com/pressly/goose). This can be installed by running the following:
@@ -21,15 +21,6 @@ The server can be started with `go run .`.
 
 The front-end should now be accessible from the web-browser at [http://localhost:8080/](http://localhost:8080/), if using the default configuration.
 
-### Creating shortened URLs
-Send `POST` requests to the `api/create` end-point with the payload containing the desired URL in JSON. The server will register the URL and generate a new shortened URL. Both the shortened URL and the original URL will be returned on success.
-
-### Using the shortened URLs
-Send `GET` requests to the `/{key}` end-point. The server will respond with a `301 Moved Permanently` response code that will redirect the browser to the original URL.
-
-### Reset
-Send `POST` requests to the `/admin/reset` end-point to clear the database.
-
 ## Development
 ### SQLC
 This package uses generated go code from queries written in sql. Modifying or creating new queries should be generating the corresponing go queries by running `sqlc generate`.
@@ -42,6 +33,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 ## TODO
 - [ ] Allow editing of payments / expenses from front-end
 - [ ] Add a reset end point for testing
+- [ ] Add admin accounts / permissions
 - [ ] Add integration tests
 - [ ] Implement refresh tokens for auth
 - [ ] Add link to create group in dashboard
