@@ -4,6 +4,7 @@ import (
 	"github.com/matt-horst/split-ways/internal/accounting"
 	"github.com/matt-horst/split-ways/internal/database"
 	"github.com/matt-horst/split-ways/web/components"
+	"fmt"
 )
 
 templ Group(user database.User, group database.Group, transactions []accounting.Transaction, balances []accounting.Balance) {
@@ -14,11 +15,11 @@ templ Group(user database.User, group database.Group, transactions []accounting.
 			<main class="card" role="main">
 				@components.Navbar(true)
 				<h1>{ group.Name }</h1>
-				<div class="action-bar">
-					<form action={ "/groups/" + group.ID.String() + "/add-user" }><button type="submit" class="action-btn">Add User</button></form>
-					<form action={ "/groups/" + group.ID.String() + "/create-expense" }><button type="submit" class="action-btn">Create Expense</button></form>
-					<form action={ "/groups/" + group.ID.String() + "/create-payment" }><button type="submit" class="action-btn">Create Payment</button></form>
-				</div>
+                <div class="action-bar">
+                    <a href={ fmt.Sprintf("/groups/%s/add-user", group.ID.String()) } class="button-accent">Add User</a>
+                    <a href={ fmt.Sprintf("/groups/%s/create-expense", group.ID.String()) } class="button-accent">Create Expense</a>
+                    <a href={ fmt.Sprintf("/groups/%s/create-payment", group.ID.String()) } class="button-accent">Create Payment</a>
+                </div>
 				@components.Summary(balances)
 				@components.TransactionsList(user, transactions)
 			</main>

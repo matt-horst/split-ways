@@ -63,7 +63,7 @@ func Dashboard(username string, groups []database.Group) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h1><div class=\"dashboard-actions\"><a href=\"/create-group\" class=\"button-accent\">+ Create Group</a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h1><div class=\"dashboard-actions\"><a href=\"/create-group\" class=\"button-accent\">Create Group</a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

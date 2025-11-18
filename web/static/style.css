@@ -222,7 +222,8 @@ button:active {
   justify-content: center;
   gap: 1rem;
   margin: 1.5rem 0 2rem 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-direction: column;
 }
 
 .action-bar form {
