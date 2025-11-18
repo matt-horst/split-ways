@@ -54,7 +54,7 @@ func main() {
 
 	db := database.New(dbConn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	if err := dbConn.PingContext(ctx); err != nil {
 		log.Fatalf("Couldn't establish database connection: %v\n", err)
 	}
@@ -102,7 +102,6 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
 
 	fmt.Printf("Now listening on %s!\n", srv.Addr)
 
