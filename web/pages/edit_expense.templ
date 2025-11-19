@@ -1,0 +1,32 @@
+package pages
+
+import (
+	"fmt"
+	"github.com/matt-horst/split-ways/internal/database"
+	"github.com/matt-horst/split-ways/web/components"
+)
+
+templ EditExpense(group database.Group, expense database.Expense) {
+	<!DOCTYPE html>
+	<html>
+		@components.Head("SplitWays")
+		<body>
+			<main class="card" role="main">
+				@components.Navbar(true)
+				<h1>Edit Expense</h1>
+				<form id="form">
+					<input id="input-amount" type="text" placeholder={ fmt.Sprintf("$%s", expense.Amount.String()) }/>
+					<input id="input-description" type="text" placeholder={ expense.Description }/>
+					<input id="input-paid-by" type="text" placeholder="paid by"/>
+					<button id="button-submit" type="submit">Submit</button>
+				</form>
+				@components.Status()
+			</main>
+			<script>
+                const groupID = "{{ group.ID.String() }}"
+                const transactionID = "{{ expense.TransactionID.String() }}"
+            </script>
+			<script src="/static/edit_expense.js" type="module"></script>
+		</body>
+	</html>
+}

@@ -2,8 +2,10 @@ const editButtons = document.querySelectorAll(".btn-edit");
 const deleteButtons = document.querySelectorAll(".btn-delete");
 
 editButtons.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-        console.log('editing ' + btn.dataset.id + '...')
+    const txID = btn.dataset.id;
+
+    btn.addEventListener("click", (event) => {
+        window.location.href = `/edit?id=${txID}`
     });
 });
 
@@ -11,8 +13,6 @@ deleteButtons.forEach(btn => {
     const txID = btn.dataset.id;
 
     btn.addEventListener("click", async (event) => {
-        event.preventDefault();
-
         try {
             const resp = await fetch(
                 `/api/groups/${groupID}/transactions`,
