@@ -31,7 +31,8 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 ```
 
 ## TODO
-- [ ] Allow editing of payments / expenses from front-end
+- [x] Allow editing of expenses 
+- [x] Allow editing of payments
 - [ ] Add a reset end point for testing
 - [ ] Add admin accounts / permissions
 - [ ] Add integration tests
@@ -44,3 +45,4 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 - [ ] Setup logging middleware
 - [ ] Setup sqlc in CI
 - [ ] Add way to remove members from group
+- [ ] Add database transaction rollback on multi-step processes
