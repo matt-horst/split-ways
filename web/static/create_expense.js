@@ -2,6 +2,7 @@ import { showError, showResult, hide } from "./status.js"
 
 const inputDescription = document.getElementById("input-description");
 const inputAmount = document.getElementById("input-amount");
+const inputPaidBy = document.getElementById("input-paid-by");
 const form = document.getElementById("form");
 const status = document.getElementById("status")
 
@@ -10,8 +11,9 @@ form.addEventListener("submit", async (event) => {
 
     hide(status)
 
-    const amount = inputAmount.value.replace('$', '');
-    const description = inputDescription.value
+    const amount = inputAmount.value.replace('$', '').trim();
+    const description = inputDescription.value.trim();
+    const paidBy = inputPaidBy.value.trim();
 
     try {
         const resp = await fetch(
@@ -22,7 +24,8 @@ form.addEventListener("submit", async (event) => {
                 body: JSON.stringify(
                     {
                         "description": description,
-                        "amount": amount
+                        "amount": amount,
+                        "paid_by": paidBy,
                     }
                 ),
                 credentials: "same-origin"

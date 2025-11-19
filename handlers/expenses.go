@@ -34,14 +34,13 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	if _, err = cfg.Db.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
 			GroupID: groupID,
 		},
-	)
-	if err != nil {
+	); err != nil {
 		log.Printf("Attempt to create expense non-user group: %v\n", err)
 		http.Error(w, "User does not belong to group", http.StatusForbidden)
 		return
@@ -50,13 +49,34 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 	data := struct {
 		Description string          `json:"description"`
 		Amount      decimal.Decimal `json:"amount"`
+		PaidBy      string          `json:"paid_by"`
 	}{}
 
-	err = json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		log.Printf("Couldn't decode request body: %v\n", err)
 		http.Error(w, "Couldn't create expense", http.StatusBadRequest)
 		return
+	}
+
+	paidBy := uuid.NullUUID{Valid: true, UUID: user.ID}
+	if data.PaidBy != "" {
+		paidByUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+		if err != nil {
+			log.Printf("Couldn't find user: %v\n", err)
+			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidBy), http.StatusBadRequest)
+			return
+		}
+
+		if _, err := cfg.Db.GetUserGroup(
+			r.Context(),
+			database.GetUserGroupParams{GroupID: groupID, UserID: paidByUser.ID},
+		); err != nil {
+			log.Printf("Couldn't create expense where paid by user is not in group: %v\n", err)
+			http.Error(w, fmt.Sprintf("%s is not in group", data.PaidBy), http.StatusBadRequest)
+			return
+		}
+
+		paidBy.UUID = paidByUser.ID
 	}
 
 	transaction, err := cfg.Db.CreateTransaction(
@@ -80,10 +100,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		r.Context(),
 		database.CreateExpenseParams{
 			TransactionID: transaction.ID,
-			PaidBy: uuid.NullUUID{
-				UUID:  user.ID,
-				Valid: true,
-			},
+			PaidBy: paidBy,
 			Description: data.Description,
 			Amount:      data.Amount,
 		},
@@ -104,7 +121,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 	debtAmount := data.Amount.Div(decimal.NewFromInt(int64(len(users))))
 
 	for _, u := range users {
-		if u.ID == user.ID {
+		if u.ID == expense.PaidBy.UUID {
 			continue
 		}
 
@@ -112,10 +129,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 			r.Context(),
 			database.CreateDebtParams{
 				ExpenseID: expense.ID,
-				OwedTo: uuid.NullUUID{
-					UUID:  user.ID,
-					Valid: true,
-				},
+				OwedTo: expense.PaidBy,
 				OwedBy: uuid.NullUUID{
 					UUID:  u.ID,
 					Valid: true,
@@ -207,7 +221,6 @@ func (cfg *Config) HandlerEditExpense(w http.ResponseWriter, r *http.Request) {
 		paidByID.UUID = paidBy.ID
 	}
 
-
 	expense, err = cfg.Db.UpdateExpense(
 		r.Context(),
 		database.UpdateExpenseParams{
@@ -247,9 +260,9 @@ func (cfg *Config) HandlerEditExpense(w http.ResponseWriter, r *http.Request) {
 			r.Context(),
 			database.CreateDebtParams{
 				ExpenseID: expense.ID,
-				OwedTo: expense.PaidBy,
-				OwedBy: uuid.NullUUID{Valid: true, UUID: u.ID},
-				Amount: debtAmount,
+				OwedTo:    expense.PaidBy,
+				OwedBy:    uuid.NullUUID{Valid: true, UUID: u.ID},
+				Amount:    debtAmount,
 			},
 		); err != nil {
 			log.Printf("Couldn't create debt: %v\n", err)

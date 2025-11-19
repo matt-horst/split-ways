@@ -50,7 +50,7 @@ func CreateExpense(group database.Group) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<h1>Create Expense</h1><form id=\"form\"><input id=\"input-amount\" type=\"text\" placeholder=\"$0.00\" required> <input id=\"input-description\" type=\"text\" placeholder=\"description...\" required> <button id=\"button-submit\" type=\"submit\">Create</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<h1>Create Expense</h1><form id=\"form\"><input id=\"input-amount\" type=\"text\" placeholder=\"$0.00\" required> <input id=\"input-description\" type=\"text\" placeholder=\"Description...\" required> <input id=\"input-paid-by\" type=\"text\" placeholder=\"Paid By\"> <button id=\"button-submit\" type=\"submit\">Create</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -64,7 +64,7 @@ func CreateExpense(group database.Group) templ.Component {
 		}
 		templ_7745c5c3_Var2, templ_7745c5c3_Err := templruntime.ScriptContentInsideStringLiteral(group.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/create_expense.templ`, Line: 24, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/create_expense.templ`, Line: 25, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {

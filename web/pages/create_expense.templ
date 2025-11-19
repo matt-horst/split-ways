@@ -15,7 +15,8 @@ templ CreateExpense(group database.Group) {
 				<h1>Create Expense</h1>
 				<form id="form">
 					<input id="input-amount" type="text" placeholder="$0.00" required/>
-					<input id="input-description" type="text" placeholder="description..." required/>
+					<input id="input-description" type="text" placeholder="Description..." required/>
+					<input id="input-paid-by" type="text" placeholder="Paid By"/>
 					<button id="button-submit" type="submit">Create</button>
 				</form>
 				@components.Status()

@@ -17,7 +17,7 @@ templ EditExpense(group database.Group, expense database.Expense) {
 				<form id="form">
 					<input id="input-amount" type="text" placeholder={ fmt.Sprintf("$%s", expense.Amount.String()) }/>
 					<input id="input-description" type="text" placeholder={ expense.Description }/>
-					<input id="input-paid-by" type="text" placeholder="paid by"/>
+					<input id="input-paid-by" type="text" placeholder="Paid By"/>
 					<button id="button-submit" type="submit">Submit</button>
 				</form>
 				@components.Status()
