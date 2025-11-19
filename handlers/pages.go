@@ -212,3 +212,53 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 
 	templ.Handler(pages.Group(user, group, txs, bs)).ServeHTTP(w, r)
 }
+
+func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to serve edit page to unauthorized user\n")
+		http.Error(w, "User not authorized", http.StatusUnauthorized)
+		return
+	}
+
+	queryParams := r.URL.Query()
+	id, err := uuid.Parse(queryParams.Get("id"))
+	if err != nil {
+		log.Printf("Couldn't parse transaction id: %v\n", err)
+		http.Error(w, "Counldn't find transaction", http.StatusBadRequest)
+		return
+	}
+
+	tx, err := cfg.Db.GetTransaction(r.Context(), id)
+	if err != nil {
+		log.Printf("Couldn't find transaction: %v\n", err)
+		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
+		return
+	}
+
+	if !tx.CreatedBy.Valid || tx.CreatedBy.UUID != user.ID {
+		log.Printf("Attempt to edit transaction by forbidden user\n")
+		http.Error(w, "Can't edit other users' transactions", http.StatusForbidden)
+		return
+	}
+
+	group, err := cfg.Db.GetGroup(r.Context(), tx.GroupID)
+
+	switch tx.Kind {
+	case "expense":
+		expense, err := cfg.Db.GetExpenseByTransaction(r.Context(), tx.ID)
+		if err != nil {
+			log.Printf("Couldn't find expense by transaction: %v\n", err)
+			http.Error(w, "Couldn't find expense", http.StatusBadRequest)
+			return
+		}
+
+		if err := pages.EditExpense(group, expense).Render(r.Context(), w); err != nil {
+			log.Printf("Failed to serve edit expense page: %v\n", err)
+			return
+		}
+
+	case "payment":
+		log.Printf("edit payment page unimplemented")
+	}
+}
