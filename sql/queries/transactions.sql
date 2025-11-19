@@ -5,7 +5,7 @@ RETURNING *;
 
 -- name: UpdateExpense :one
 UPDATE expenses
-SET paid_by = $2, description = $3
+SET paid_by = $2, description = $3, amount = $4
 WHERE id = $1
 RETURNING *;
 
@@ -20,6 +20,16 @@ INSERT INTO debts (expense_id, owed_to, owed_by, amount)
 VALUES ($1, $2, $3, $4)
 RETURNING *;
 
+-- name: UpdateDebt :one
+UPDATE debts
+SET amount = $2
+WHERE id = $1
+RETURNING *;
+
+-- name: DeleteDebtsByExpense :exec
+DELETE FROM debts
+WHERE expense_id = $1;
+
 -- name: CreateTransaction :one
 INSERT INTO transactions (group_id, created_by, kind)
 VALUES ($1, $2, $3)
@@ -33,6 +43,12 @@ WHERE id = $1;
 SELECT * FROM transactions
 WHERE group_id = $1
 ORDER BY updated_at DESC;
+
+-- name: UpdateTransaction :one
+UPDATE transactions
+SET updated_at = NOW()
+WHERE id = $1
+RETURNING *;
 
 -- name: DeleteTransaction :exec
 DELETE FROM transactions

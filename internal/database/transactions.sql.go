@@ -132,6 +132,16 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
+const deleteDebtsByExpense = `-- name: DeleteDebtsByExpense :exec
+DELETE FROM debts
+WHERE expense_id = $1
+`
+
+func (q *Queries) DeleteDebtsByExpense(ctx context.Context, expenseID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteDebtsByExpense, expenseID)
+	return err
+}
+
 const deleteTransaction = `-- name: DeleteTransaction :exec
 DELETE FROM transactions
 WHERE id = $1
@@ -289,9 +299,34 @@ func (q *Queries) GetTransactionsByGroup(ctx context.Context, groupID uuid.UUID)
 	return items, nil
 }
 
+const updateDebt = `-- name: UpdateDebt :one
+UPDATE debts
+SET amount = $2
+WHERE id = $1
+RETURNING id, expense_id, owed_by, owed_to, amount
+`
+
+type UpdateDebtParams struct {
+	ID     uuid.UUID
+	Amount decimal.Decimal
+}
+
+func (q *Queries) UpdateDebt(ctx context.Context, arg UpdateDebtParams) (Debt, error) {
+	row := q.db.QueryRowContext(ctx, updateDebt, arg.ID, arg.Amount)
+	var i Debt
+	err := row.Scan(
+		&i.ID,
+		&i.ExpenseID,
+		&i.OwedBy,
+		&i.OwedTo,
+		&i.Amount,
+	)
+	return i, err
+}
+
 const updateExpense = `-- name: UpdateExpense :one
 UPDATE expenses
-SET paid_by = $2, description = $3
+SET paid_by = $2, description = $3, amount = $4
 WHERE id = $1
 RETURNING id, paid_by, description, transaction_id, amount
 `
@@ -300,10 +335,16 @@ type UpdateExpenseParams struct {
 	ID          uuid.UUID
 	PaidBy      uuid.NullUUID
 	Description string
+	Amount      decimal.Decimal
 }
 
 func (q *Queries) UpdateExpense(ctx context.Context, arg UpdateExpenseParams) (Expense, error) {
-	row := q.db.QueryRowContext(ctx, updateExpense, arg.ID, arg.PaidBy, arg.Description)
+	row := q.db.QueryRowContext(ctx, updateExpense,
+		arg.ID,
+		arg.PaidBy,
+		arg.Description,
+		arg.Amount,
+	)
 	var i Expense
 	err := row.Scan(
 		&i.ID,
@@ -336,6 +377,27 @@ func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) (P
 		&i.PaidTo,
 		&i.Amount,
 		&i.TransactionID,
+	)
+	return i, err
+}
+
+const updateTransaction = `-- name: UpdateTransaction :one
+UPDATE transactions
+SET updated_at = NOW()
+WHERE id = $1
+RETURNING id, created_at, updated_at, created_by, group_id, kind
+`
+
+func (q *Queries) UpdateTransaction(ctx context.Context, id uuid.UUID) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, updateTransaction, id)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CreatedBy,
+		&i.GroupID,
+		&i.Kind,
 	)
 	return i, err
 }
