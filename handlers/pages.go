@@ -259,6 +259,16 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "payment":
-		log.Printf("edit payment page unimplemented")
+		payment, err := cfg.Db.GetPaymentByTransaction(r.Context(), tx.ID)
+		if err != nil {
+			log.Printf("Couldn't find payment by transaction: %v\n", err)
+			http.Error(w, "Couldn't find payment", http.StatusBadRequest)
+			return
+		}
+
+		if err := pages.EditPayment(group, payment).Render(r.Context(), w); err != nil {
+			log.Printf("Failed to serve edit payment page: %v\n", err)
+			return
+		}
 	}
 }

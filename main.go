@@ -80,8 +80,9 @@ func main() {
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerGetGroupUsers).Methods("GET")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerAddUserToGroup).Methods("POST")
 	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerCreateExpense).Methods("POST")
-	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerEditExpense).Queries("id", "{id}").Methods("PUT")
+	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerUpdateExpense).Queries("id", "{id}").Methods("PUT")
 	groups.HandleFunc("/{group_id}/payments", cfg.HandlerCreatePayment).Methods("POST")
+	groups.HandleFunc("/{group_id}/payments", cfg.HandlerUpdatePayment).Methods("PUT")
 	groups.HandleFunc("/{group_id}/transactions", cfg.HandlerDeleteTransaction).Methods("DELETE")
 
 	router.Handle("/", templ.Handler(pages.Index())).Methods("GET")

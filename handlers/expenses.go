@@ -154,7 +154,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (cfg *Config) HandlerEditExpense(w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(userContextKey).(database.User)
 	if !ok {
 		log.Printf("Attempt to edit expense for unauthorized user\n")

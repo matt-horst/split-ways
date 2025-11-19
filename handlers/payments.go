@@ -147,3 +147,99 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
+
+func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to update payment by unauthorized user\n")
+		http.Error(w, "User not authorized", http.StatusUnauthorized)
+		return
+	}
+
+	txID, err := uuid.Parse(r.URL.Query().Get("id"))
+	if err != nil {
+		log.Printf("Couldn't parse transaction ID: %v\n", err)
+		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
+		return
+	}
+
+	tx, err := cfg.Db.GetTransaction(r.Context(), txID)
+	if err != nil {
+		log.Printf("Couldn't find transaction: %v\n", err)
+		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
+		return
+	}
+
+	if !tx.CreatedBy.Valid || tx.CreatedBy.UUID != user.ID {
+		log.Printf("Attempt to update payment for other user\n")
+		http.Error(w, "Can't update other users' payemnts", http.StatusForbidden)
+		return
+	}
+
+	payment, err := cfg.Db.GetPaymentByTransaction(r.Context(), txID)
+	if err != nil {
+		log.Printf("Couldn't find payment: %v\n", err)
+		http.Error(w, "Couldn't find payment", http.StatusBadRequest)
+		return
+	}
+
+	data := struct {
+		PaidBy string          `json:"paid_by"`
+		PaidTo string          `json:"paid_to"`
+		Amount decimal.Decimal `json:"amount"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		log.Printf("Couldn't decode request body: %v\n", err)
+		http.Error(w, "Couldn't update payment", http.StatusBadRequest)
+		return
+	}
+
+	paidBy := payment.PaidBy
+	if data.PaidBy != "" {
+		paidByUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+		if err != nil {
+			log.Printf("Couln't find user: %v\n", err)
+			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidBy), http.StatusBadRequest)
+			return
+		}
+
+		paidBy.UUID = paidByUser.ID
+		paidBy.Valid = true
+	}
+
+
+	paidTo := payment.PaidTo
+	if data.PaidTo != "" {
+		paidToUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidTo)
+		if err != nil {
+			log.Printf("Couln't find user: %v\n", err)
+			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidTo), http.StatusBadRequest)
+			return
+		}
+
+		paidTo.UUID = paidToUser.ID
+		paidTo.Valid = true
+	}
+
+	if data.Amount.LessThan(decimal.Zero) {
+		data.Amount = payment.Amount
+	}
+
+	payment, err = cfg.Db.UpdatePayment(
+		r.Context(),
+		database.UpdatePaymentParams{
+			ID: payment.ID,
+			Amount: data.Amount,
+			PaidBy: paidBy,
+			PaidTo: paidTo,
+		},
+	)
+	if err != nil {
+		log.Printf("Couldn't update payment: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

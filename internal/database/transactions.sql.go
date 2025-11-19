@@ -358,7 +358,7 @@ func (q *Queries) UpdateExpense(ctx context.Context, arg UpdateExpenseParams) (E
 
 const updatePayment = `-- name: UpdatePayment :one
 UPDATE payments
-SET amount = $2
+SET amount = $2, paid_by = $3, paid_to = $4
 WHERE id = $1
 RETURNING id, paid_by, paid_to, amount, transaction_id
 `
@@ -366,10 +366,17 @@ RETURNING id, paid_by, paid_to, amount, transaction_id
 type UpdatePaymentParams struct {
 	ID     uuid.UUID
 	Amount decimal.Decimal
+	PaidBy uuid.NullUUID
+	PaidTo uuid.NullUUID
 }
 
 func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) (Payment, error) {
-	row := q.db.QueryRowContext(ctx, updatePayment, arg.ID, arg.Amount)
+	row := q.db.QueryRowContext(ctx, updatePayment,
+		arg.ID,
+		arg.Amount,
+		arg.PaidBy,
+		arg.PaidTo,
+	)
 	var i Payment
 	err := row.Scan(
 		&i.ID,

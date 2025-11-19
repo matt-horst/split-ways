@@ -61,7 +61,7 @@ RETURNING *;
 
 -- name: UpdatePayment :one
 UPDATE payments
-SET amount = $2
+SET amount = $2, paid_by = $3, paid_to = $4
 WHERE id = $1
 RETURNING *;
 
