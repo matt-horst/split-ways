@@ -568,3 +568,27 @@ button:active {
     padding: 0.4rem 0.7rem;
     font-size: 0.85rem;
 }
+
+.add-user-section {
+  margin-bottom: 1.5rem;
+}
+
+.add-user-section h2 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.rename-section {
+  margin-bottom: 1.5rem;
+}
+
+.rename-section h2 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}

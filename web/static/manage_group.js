@@ -1,16 +1,18 @@
 import { showError, showResult, hide } from "./status.js"
 
 const inputUsername = document.getElementById("input-username");
-const form = document.getElementById("form");
+const inputNewName = document.getElementById("input-new-name");
+const addUserForm = document.getElementById("add-user-form");
+const renameGroupForm = document.getElementById("rename-group-form");
 const status = document.getElementById("status")
 const deleteButtons = document.querySelectorAll(".btn-delete");
 
-form.addEventListener("submit", async (event) => {
+addUserForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     hide(status)
 
-    const username = inputUsername.value;
+    const username = inputUsername.value.trim();
 
     try {
         const resp = await fetch(
@@ -62,3 +64,28 @@ deleteButtons.forEach(btn => {
     });
 });
 
+renameGroupForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = inputNewName.value.trim();
+
+    try {
+        const resp = await fetch(
+            "/api/groups/" + groupID,
+            {
+                method: "PUT",
+                header: {"Content-Type": "application/json"},
+                body: JSON.stringify({"name": name}),
+                credentials: "same-origin"
+            }
+        );
+
+        if (!resp.ok) {
+            const msg = await resp.text();
+            console.log(`${resp.status}: ${msg}`);
+        } else {
+            window.location.href = `/groups/${groupID}`;
+        }
+    } catch (e) {
+        console.log(e)
+    }
+});

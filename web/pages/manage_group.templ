@@ -23,25 +23,34 @@ templ ManageGroup(group database.Group, currentUser database.User, members []dat
 									@components.UserIcon()
 								</div>
 								<span class="member-name">{ user.Username }</span>
-                                <div class="user-actions">
-								if user.ID != currentUser.ID {
+								<div class="user-actions">
+									if user.ID != currentUser.ID {
 										<button class="icon-btn btn-delete" data-id={ user.ID.String() } aria-label="Delete">
 											@components.DeleteIcon()
 										</button>
-								} else {
-                                    <div class="icon-placeholder"></div>
-                                }
-                                </div>
+									} else {
+										<div class="icon-placeholder"></div>
+									}
+								</div>
 							</li>
 						}
 					</ul>
 				</section>
-				<hr class="divider"/>
-				<form id="form">
-					<input id="input-username" type="text" placeholder="username" required/>
-					<button id="button-submit" type="submit">Add</button>
-				</form>
-				@components.Status()
+				<section class="add-user-section">
+					<h2>Add User</h2>
+					<form id="add-user-form">
+						<input id="input-username" type="text" placeholder="username" required/>
+						<button id="button-add-user" type="submit">Add</button>
+					</form>
+					@components.Status()
+				</section>
+                <section class="rename-section">
+                    <h2>Rename Group</h2>
+                    <form id="rename-group-form">
+                        <input id="input-new-name" type="text" placeholder={ group.Name } required>
+                        <button id="button-rename" type="submit">Rename</button>
+                    </form>
+                </section>
 			</main>
 			<script>
             const groupID = "{{ group.ID.String() }}"

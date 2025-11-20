@@ -71,6 +71,64 @@ func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (cfg *Config) HandlerUpdateGroup(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempted to create group with unauthenticated user\n")
+		http.Error(w, "User not authorized", http.StatusUnauthorized)
+		return
+	}
+
+	vars := mux.Vars(r)
+	groupIDPath, ok := vars["group_id"]
+	if !ok {
+		log.Printf("Missing group id\n")
+		http.Error(w, "Missing group id", http.StatusBadRequest)
+		return
+	}
+
+	groupID, err := uuid.Parse(groupIDPath)
+	if err != nil {
+		log.Printf("Couldn't parse group id: %v\n", err)
+		http.Error(w, "Couldnt parse group id", http.StatusBadRequest)
+		return
+	}
+
+	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	if err != nil {
+		log.Printf("Couldn't find group: %v\n", err)
+		http.Error(w, "Couldn't find group", http.StatusBadRequest)
+		return
+	}
+
+	if group.Owner != user.ID {
+		log.Printf("Attempt to update group from non-owner\n")
+		http.Error(w, "Can't update group as non-owner", http.StatusForbidden)
+		return
+	}
+
+	data := struct {
+		Name string `json:"name"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		log.Printf("Couldn't decode group data: %v\n", err)
+		http.Error(w, "Couldn't create group", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := cfg.Db.UpdateGroupName(
+		r.Context(),
+		database.UpdateGroupNameParams{ID: groupID, Name: data.Name},
+	); err != nil {
+		log.Printf("Couldn't update group: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(userContextKey).(database.User)
 	if !ok {
