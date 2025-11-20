@@ -33,7 +33,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 ## TODO
 - [x] Allow editing of expenses 
 - [x] Allow editing of payments
-- [ ] Add a reset end point for testing
+- [x] Add a reset end point for testing
 - [ ] Add admin accounts / permissions
 - [ ] Add integration tests
 - [ ] Implement refresh tokens for auth
