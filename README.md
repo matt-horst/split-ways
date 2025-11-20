@@ -38,7 +38,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 - [ ] Add integration tests
 - [ ] Implement refresh tokens for auth
 - [x] Add link to create group in dashboard
-- [ ] Add links to edit / delete groups that the user creates
+- [x] Add links to edit / delete groups that the user creates
 - [x] Add style to the list of users in add user page
 - [ ] Add way to specify how the expense should be split
 - [ ] Add dates to the transaction list

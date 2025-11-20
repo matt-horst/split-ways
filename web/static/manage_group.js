@@ -6,6 +6,7 @@ const addUserForm = document.getElementById("add-user-form");
 const renameGroupForm = document.getElementById("rename-group-form");
 const status = document.getElementById("status")
 const deleteButtons = document.querySelectorAll(".btn-delete");
+const deleteGroupForm = document.getElementById("delete-group-form");
 
 addUserForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -87,5 +88,28 @@ renameGroupForm.addEventListener("submit", async (event) => {
         }
     } catch (e) {
         console.log(e)
+    }
+});
+
+deleteGroupForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    try {
+        const resp = await fetch(
+            "/api/groups/" + groupID,
+            {
+                method: "DELETE",
+                credentials: "same-origin"
+            }
+        );
+
+        if (resp.ok) {
+            window.location.href = "/";
+        } else {
+            const msg = await resp.text();
+            console.log(`${resp.status}: ${msg}`);
+        }
+    } catch (e) {
+        console.log(e);
     }
 });

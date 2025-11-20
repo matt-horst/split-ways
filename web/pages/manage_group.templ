@@ -51,6 +51,12 @@ templ ManageGroup(group database.Group, currentUser database.User, members []dat
                         <button id="button-rename" type="submit">Rename</button>
                     </form>
                 </section>
+                <section class="delete-section">
+                    <h2>Delete Group</h2>
+                    <form id="delete-group-form">
+                        <button id="button-delete" type="submit">Delete</button>
+                    </form>
+                </section>
 			</main>
 			<script>
             const groupID = "{{ group.ID.String() }}"

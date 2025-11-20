@@ -79,6 +79,7 @@ func main() {
 	groups.Use(cfg.AuthenticatedUserMiddleware)
 	groups.HandleFunc("", cfg.HandlerCreateGroup).Methods("POST")
 	groups.HandleFunc("/{group_id}", cfg.HandlerUpdateGroup).Methods("PUT")
+	groups.HandleFunc("/{group_id}", cfg.HandlerDeleteGroup).Methods("DELETE")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerGetGroupUsers).Methods("GET")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerAddUserToGroup).Methods("POST")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerRemoveUserFromGroup).Methods("DELETE")

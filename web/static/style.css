@@ -592,3 +592,39 @@ button:active {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
+
+.delete-section {
+  margin-bottom: 1.5rem;
+}
+
+.delete-section h2 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.1rem;
+  color: var(--error-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+/* === Danger Button === */
+.button-danger,
+#button-delete {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.button-danger:hover,
+#button-delete:hover {
+  background: #ff7777; /* slightly brighter red for hover */
+  transform: translateY(-1px);
+}
+
+.button-danger:active,
+#button-delete:active {
+  transform: translateY(0);
+}

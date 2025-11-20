@@ -31,3 +31,8 @@ WHERE users_groups.group_id = $1;
 SELECT users_groups.group_id AS group_id, users.* FROM users
 INNER JOIN users_groups ON users.id = users_groups.user_id
 WHERE group_id = $1 AND users.id != $2;
+
+-- name: DeleteGroup :one
+DELETE FROM groups
+WHERE id = $1
+RETURNING *;

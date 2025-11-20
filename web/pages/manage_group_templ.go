@@ -151,13 +151,13 @@ func ManageGroup(group database.Group, currentUser database.User, members []data
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" required> <button id=\"button-rename\" type=\"submit\">Rename</button></form></section></main><script>\n            const groupID = \"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" required> <button id=\"button-rename\" type=\"submit\">Rename</button></form></section><section class=\"delete-section\"><h2>Delete Group</h2><form id=\"delete-group-form\"><button id=\"button-delete\" type=\"submit\">Delete</button></form></section></main><script>\n            const groupID = \"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Var6, templ_7745c5c3_Err := templruntime.ScriptContentInsideStringLiteral(group.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/manage_group.templ`, Line: 56, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/manage_group.templ`, Line: 62, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {

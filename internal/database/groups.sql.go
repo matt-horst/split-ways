@@ -36,6 +36,25 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Group
 	return i, err
 }
 
+const deleteGroup = `-- name: DeleteGroup :one
+DELETE FROM groups
+WHERE id = $1
+RETURNING id, name, created_at, updated_at, owner
+`
+
+func (q *Queries) DeleteGroup(ctx context.Context, id uuid.UUID) (Group, error) {
+	row := q.db.QueryRowContext(ctx, deleteGroup, id)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Owner,
+	)
+	return i, err
+}
+
 const getGroup = `-- name: GetGroup :one
 SELECT id, name, created_at, updated_at, owner FROM groups
 WHERE id = $1

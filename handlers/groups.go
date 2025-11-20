@@ -331,3 +331,47 @@ func (cfg *Config) HandlerRemoveUserFromGroup(w http.ResponseWriter, r *http.Req
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (cfg *Config) HandlerDeleteGroup(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempt to remove user from group using unauthorized user\n")
+		http.Error(w, "User unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	groupIDPath, ok := mux.Vars(r)["group_id"]
+	if !ok {
+		log.Printf("Missing group id\n")
+		http.Error(w, "Missing group id", http.StatusBadRequest)
+		return
+	}
+
+	groupID, err := uuid.Parse(groupIDPath)
+	if err != nil {
+		log.Printf("Couldn't parse group id: %v\n", err)
+		http.Error(w, "Couldn't parse group id", http.StatusBadRequest)
+		return
+	}
+
+	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	if err != nil {
+		log.Printf("Couldn't find group: %v\n", err)
+		http.Error(w, "Couldn't find group", http.StatusBadRequest)
+		return
+	}
+
+	if group.Owner != user.ID {
+		log.Printf("Attempt to remove user from group by non-owner\n")
+		http.Error(w, "Can't remove users from group as non-owner", http.StatusForbidden)
+		return
+	}
+
+	if _, err := cfg.Db.DeleteGroup(r.Context(), groupID); err != nil {
+		log.Printf("Couldn't delete group: %v\n", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
