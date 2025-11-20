@@ -44,5 +44,5 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 - [ ] Add dates to the transaction list
 - [ ] Setup logging middleware
 - [ ] Setup sqlc in CI
-- [ ] Add way to remove members from group
+- [x] Add way to remove members from group
 - [ ] Add database transaction rollback on multi-step processes
