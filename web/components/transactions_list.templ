@@ -6,60 +6,70 @@ import (
 )
 
 templ TransactionsList(user database.User, ts []accounting.Transaction) {
-    <ul class="transactions-list">
-        for _, t := range ts {
-            <li class="transaction-item">
-                switch t.Kind {
-                case accounting.ExpenseKind:
-                    @ExpenseIcon()
-                case accounting.PaymentKind:
-                    @PaymentIcon()
-                }
-                <span class="transaction-text">
-                switch t.Kind {
-                    case accounting.ExpenseKind:
-                        {{
-                            paidBy := "Deleted User" 
-                            if t.Expense.PaidBy != nil {
-                                paidBy = t.Expense.PaidBy.Username
-                            }
-                        }}
-                        { paidBy } spent
-                        &nbsp;<span class="amount negative">${ t.Expense.Amount.String() }</span>&nbsp;
-                        on { t.Expense.Description }
-                    case accounting.PaymentKind:
-                        {{ 
-                            paidBy := "Deleted User"
-                            if t.Payment.PaidBy != nil {
-                                paidBy = t.Payment.PaidBy.Username
-                            }
+	<ul class="transactions-list">
+		for _, t := range ts {
+			<li class="transaction-item">
+                <div class="transaction-icon">
+				switch t.Kind {
+					case accounting.ExpenseKind:
+						@ExpenseIcon()
+					case accounting.PaymentKind:
+						@PaymentIcon()
+				}
+                </div>
+				<div class="transaction-body">
+					<div class="transaction-header">
+						<span class="transaction-date">
+							{ t.UpdatedAt.Format("Jan 02") }
+						</span>
+					</div>
+					<span class="transaction-text">
+						switch t.Kind {
+							case accounting.ExpenseKind:
+								{{
+									paidBy := "Deleted User"
+									if t.Expense.PaidBy != nil {
+										paidBy = t.Expense.PaidBy.Username
+									}
+								}}
+								{ paidBy } spent
+								&nbsp;<span class="amount negative">${ t.Expense.Amount.String() }</span>&nbsp;
+								on { t.Expense.Description }
+							case accounting.PaymentKind:
+								{{
+									paidBy := "Deleted User"
+									if t.Payment.PaidBy != nil {
+										paidBy = t.Payment.PaidBy.Username
+									}
 
-                            paidTo := "Deleted User"
-                            if t.Payment.PaidTo != nil {
-                                paidTo = t.Payment.PaidTo.Username
-                            }
-                        }}
-                        { paidBy } paid { paidTo }
-                        &nbsp;<span class="amount positive">${ t.Payment.Amount.String() }</span>&nbsp;
-                    default:
-                        Unknown type: { t.Kind } (expecting: {accounting.ExpenseKind} or {accounting.PaymentKind})
-                    }
-                </span>
-
-                if t.CreatedBy != nil && t.CreatedBy.ID == user.ID {
-                    <div class="transaction-actions">
-                        <!-- Edit button -->
-                        <button class="icon-btn btn-edit" data-id={ t.ID.String() } aria-label="Edit">
-                            @EditIcon()
-                        </button>
-
-                        <!-- Delete button -->
-                        <button class="icon-btn btn-delete" data-id={ t.ID.String() } aria-label="Delete">
-                            @DeleteIcon()
-                        </button>
-                    </div>
-                }
-            </li>
-        }
-    </ul>
+									paidTo := "Deleted User"
+									if t.Payment.PaidTo != nil {
+										paidTo = t.Payment.PaidTo.Username
+									}
+								}}
+								{ paidBy } paid { paidTo }
+								&nbsp;<span class="amount positive">${ t.Payment.Amount.String() }</span>&nbsp;
+							default:
+								Unknown type: { t.Kind } (expecting: { accounting.ExpenseKind } or { accounting.PaymentKind })
+						}
+					</span>
+				</div>
+				<div class="transaction-actions">
+					if t.CreatedBy != nil && t.CreatedBy.ID == user.ID {
+						<!-- Edit button -->
+						<button class="icon-btn btn-edit" data-id={ t.ID.String() } aria-label="Edit">
+							@EditIcon()
+						</button>
+						<!-- Delete button -->
+						<button class="icon-btn btn-delete" data-id={ t.ID.String() } aria-label="Delete">
+							@DeleteIcon()
+						</button>
+					} else {
+						<div class="icon-placeholder"></div>
+						<div class="icon-placeholder"></div>
+					}
+				</div>
+			</li>
+		}
+	</ul>
 }
