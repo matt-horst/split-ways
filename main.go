@@ -73,6 +73,7 @@ func main() {
 	router.Handle("/api/users", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerUpdateUser))).Methods("PUT")
 	router.HandleFunc("/api/login", cfg.HandlerLogin).Methods("POST")
 	router.HandleFunc("/api/logout", cfg.HandlerLogout).Methods("POST")
+	router.HandleFunc("/api/reset", cfg.HandlerReset).Methods("POST")
 
 	groups := router.NewRoute().PathPrefix("/api/groups").Subrouter()
 	groups.Use(cfg.AuthenticatedUserMiddleware)

@@ -29,7 +29,7 @@ form.addEventListener("submit", async (event) => {
             showError(status, msg);
             console.log(`${resp.status}: ${msg}`);
         } else {
-            window.location.href = "/dashboard";
+            window.location.href = "/";
         }
     } catch (e) {
         console.log(e)
