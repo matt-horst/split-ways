@@ -509,6 +509,7 @@ button:active {
 .member-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: #1b1b1d;
   border: 1px solid #2a2a2c;
   padding: 0.6rem 0.9rem;
@@ -542,10 +543,28 @@ button:active {
 .member-name {
   font-size: 0.95rem;
   color: var(--text-color);
+  flex-grow: 1;
 }
 
 .divider {
   border: none;
   border-top: 1px solid var(--border-color);
   margin: 1.5rem 0;
+}
+
+.user-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-conteng: center;
+  width: 32px;
+}
+
+.icon-placeholder {
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
 }

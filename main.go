@@ -80,6 +80,7 @@ func main() {
 	groups.HandleFunc("", cfg.HandlerCreateGroup).Methods("POST")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerGetGroupUsers).Methods("GET")
 	groups.HandleFunc("/{group_id}/users", cfg.HandlerAddUserToGroup).Methods("POST")
+	groups.HandleFunc("/{group_id}/users", cfg.HandlerRemoveUserFromGroup).Methods("DELETE")
 	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerCreateExpense).Methods("POST")
 	groups.HandleFunc("/{group_id}/expenses", cfg.HandlerUpdateExpense).Queries("id", "{id}").Methods("PUT")
 	groups.HandleFunc("/{group_id}/payments", cfg.HandlerCreatePayment).Methods("POST")
@@ -93,7 +94,7 @@ func main() {
 	router.Handle("/edit", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerEditPage))).Queries("id", "{id}").Methods("GET")
 	router.Handle("/groups/{group_id}", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerGroupPage))).Methods("GET")
 	router.Handle("/create-group", cfg.AuthenticatedUserMiddleware(templ.Handler(pages.CreateGroup())))
-	router.Handle("/groups/{group_id}/add-user", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerAddUserToGroupPage)))
+	router.Handle("/groups/{group_id}/manage", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerManageGroupPage)))
 	router.Handle("/groups/{group_id}/create-expense", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreateExpensePage)))
 	router.Handle("/groups/{group_id}/create-payment", cfg.AuthenticatedUserMiddleware(http.HandlerFunc(cfg.HandlerCreatePaymentPage)))
 

@@ -219,3 +219,57 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
+
+func (cfg *Config) HandlerRemoveUserFromGroup(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(userContextKey).(database.User)
+	if !ok {
+		log.Printf("Attempt to remove user from group using unauthorized user\n")
+		http.Error(w, "User unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	groupIDPath, ok := mux.Vars(r)["group_id"]
+	if !ok {
+		log.Printf("Missing group id\n")
+		http.Error(w, "Missing group id", http.StatusBadRequest)
+		return
+	}
+
+	groupID, err := uuid.Parse(groupIDPath)
+	if err != nil {
+		log.Printf("Couldn't parse group id: %v\n", err)
+		http.Error(w, "Couldn't parse group id", http.StatusBadRequest)
+		return
+	}
+
+	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	if err != nil {
+		log.Printf("Couldn't find group: %v\n", err)
+		http.Error(w, "Couldn't find group", http.StatusBadRequest)
+		return
+	}
+
+	if group.Owner != user.ID {
+		log.Printf("Attempt to remove user from group by non-owner\n")
+		http.Error(w, "Can't remove users from group as non-owner", http.StatusForbidden)
+		return
+	}
+
+	data := struct {
+		ID uuid.UUID `json:"id"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		log.Printf("Couldn't decode request body: %v\n", err)
+		http.Error(w, "Malformed request body", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := cfg.Db.DeleteUserGroup(r.Context(), database.DeleteUserGroupParams{UserID: data.ID, GroupID: groupID}); err != nil {
+		log.Printf("Couln't remove user from group; user not in group: %v\n", err)
+		http.Error(w, "User not in group", http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

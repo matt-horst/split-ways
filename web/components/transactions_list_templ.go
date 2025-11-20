@@ -198,7 +198,7 @@ func TransactionsList(user database.User, ts []accounting.Transaction) templ.Com
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if t.CreatedBy.ID == user.ID {
+			if t.CreatedBy != nil && t.CreatedBy.ID == user.ID {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"transaction-actions\"><!-- Edit button --><button class=\"icon-btn btn-edit\" data-id=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

@@ -5,14 +5,14 @@ import (
 	"github.com/matt-horst/split-ways/web/components"
 )
 
-templ AddUser(group database.Group, currentUser database.User, members []database.User) {
+templ ManageGroup(group database.Group, currentUser database.User, members []database.User) {
 	<!DOCTYPE html>
 	<html>
 		@components.Head("SplitWays")
 		<body>
 			<main class="card" role="main">
 				@components.Navbar(true)
-				<h1>Add User</h1>
+				<h1>Manage Group</h1>
 				<h2>{ group.Name }</h2>
 				<section class="members-section">
 					<h2>Existing Members</h2>
@@ -23,6 +23,15 @@ templ AddUser(group database.Group, currentUser database.User, members []databas
 									@components.UserIcon()
 								</div>
 								<span class="member-name">{ user.Username }</span>
+                                <div class="user-actions">
+								if user.ID != currentUser.ID {
+										<button class="icon-btn btn-delete" data-id={ user.ID.String() } aria-label="Delete">
+											@components.DeleteIcon()
+										</button>
+								} else {
+                                    <div class="icon-placeholder"></div>
+                                }
+                                </div>
 							</li>
 						}
 					</ul>
@@ -37,7 +46,7 @@ templ AddUser(group database.Group, currentUser database.User, members []databas
 			<script>
             const groupID = "{{ group.ID.String() }}"
         </script>
-			<script src="/static/add_user.js" type="module"></script>
+			<script src="/static/manage_group.js" type="module"></script>
 		</body>
 	</html>
 }

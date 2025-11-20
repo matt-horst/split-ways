@@ -12,7 +12,7 @@ import (
 	"github.com/matt-horst/split-ways/web/pages"
 )
 
-func (cfg *Config) HandlerAddUserToGroupPage(w http.ResponseWriter, r *http.Request) {
+func (cfg *Config) HandlerManageGroupPage(w http.ResponseWriter, r *http.Request) {
 	groupIDPath, ok := mux.Vars(r)["group_id"]
 	if !ok {
 		log.Printf("Couldn't find group ID in path\n")
@@ -61,7 +61,7 @@ func (cfg *Config) HandlerAddUserToGroupPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	templ.Handler(pages.AddUser(group, user, members)).ServeHTTP(w, r)
+	templ.Handler(pages.ManageGroup(group, user, members)).ServeHTTP(w, r)
 }
 
 func (cfg *Config) HandlerCreateExpensePage(w http.ResponseWriter, r *http.Request) {

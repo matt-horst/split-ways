@@ -28,3 +28,21 @@ func (q *Queries) CreateUserGroup(ctx context.Context, arg CreateUserGroupParams
 	err := row.Scan(&i.ID, &i.UserID, &i.GroupID)
 	return i, err
 }
+
+const deleteUserGroup = `-- name: DeleteUserGroup :one
+DELETE FROM users_groups
+WHERE group_id = $1 AND user_id = $2
+RETURNING id, user_id, group_id
+`
+
+type DeleteUserGroupParams struct {
+	GroupID uuid.UUID
+	UserID  uuid.UUID
+}
+
+func (q *Queries) DeleteUserGroup(ctx context.Context, arg DeleteUserGroupParams) (UsersGroup, error) {
+	row := q.db.QueryRowContext(ctx, deleteUserGroup, arg.GroupID, arg.UserID)
+	var i UsersGroup
+	err := row.Scan(&i.ID, &i.UserID, &i.GroupID)
+	return i, err
+}

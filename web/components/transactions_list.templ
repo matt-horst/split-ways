@@ -46,7 +46,7 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
                     }
                 </span>
 
-                if t.CreatedBy.ID == user.ID {
+                if t.CreatedBy != nil && t.CreatedBy.ID == user.ID {
                     <div class="transaction-actions">
                         <!-- Edit button -->
                         <button class="icon-btn btn-edit" data-id={ t.ID.String() } aria-label="Edit">

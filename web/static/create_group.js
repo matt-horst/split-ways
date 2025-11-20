@@ -29,7 +29,7 @@ form.addEventListener("submit", async (event) => {
         } else {
             const body = await resp.json()
             console.log(JSON.stringify(body))
-            window.location.href = "/dashboard";
+            window.location.href = "/";
         }
     } catch (e) {
         console.log(e)

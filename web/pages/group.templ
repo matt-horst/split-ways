@@ -16,9 +16,11 @@ templ Group(user database.User, group database.Group, transactions []accounting.
 				@components.Navbar(true)
 				<h1>{ group.Name }</h1>
                 <div class="action-bar">
-                    <a href={ fmt.Sprintf("/groups/%s/add-user", group.ID.String()) } class="button-accent">Add User</a>
                     <a href={ fmt.Sprintf("/groups/%s/create-expense", group.ID.String()) } class="button-accent">Create Expense</a>
                     <a href={ fmt.Sprintf("/groups/%s/create-payment", group.ID.String()) } class="button-accent">Create Payment</a>
+                    if group.Owner == user.ID {
+                        <a href={ fmt.Sprintf("/groups/%s/manage", group.ID.String()) } class="button-accent">Manage Group</a>
+                    }
                 </div>
 				@components.Summary(balances)
 				@components.TransactionsList(user, transactions)
