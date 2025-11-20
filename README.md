@@ -43,6 +43,6 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 - [ ] Add way to specify how the expense should be split
 - [x] Add dates to the transaction list
 - [ ] Setup logging middleware
-- [ ] Setup sqlc in CI
+- [x] Setup sqlc in CI
 - [x] Add way to remove members from group
 - [ ] Add database transaction rollback on multi-step processes
