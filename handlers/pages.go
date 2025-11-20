@@ -243,6 +243,11 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	group, err := cfg.Db.GetGroup(r.Context(), tx.GroupID)
+	if err != nil {
+		log.Printf("Couldn't find group: %v\n", err)
+		http.Error(w, "Couldn't find group", http.StatusBadRequest)
+		return
+	}
 
 	switch tx.Kind {
 	case "expense":

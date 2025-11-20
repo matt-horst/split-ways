@@ -208,7 +208,6 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 		paidBy.Valid = true
 	}
 
-
 	paidTo := payment.PaidTo
 	if data.PaidTo != "" {
 		paidToUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidTo)
@@ -229,7 +228,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 	payment, err = cfg.Db.UpdatePayment(
 		r.Context(),
 		database.UpdatePaymentParams{
-			ID: payment.ID,
+			ID:     payment.ID,
 			Amount: data.Amount,
 			PaidBy: paidBy,
 			PaidTo: paidTo,

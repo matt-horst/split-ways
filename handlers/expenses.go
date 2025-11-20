@@ -100,9 +100,9 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		r.Context(),
 		database.CreateExpenseParams{
 			TransactionID: transaction.ID,
-			PaidBy: paidBy,
-			Description: data.Description,
-			Amount:      data.Amount,
+			PaidBy:        paidBy,
+			Description:   data.Description,
+			Amount:        data.Amount,
 		},
 	)
 	if err != nil {
@@ -129,7 +129,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 			r.Context(),
 			database.CreateDebtParams{
 				ExpenseID: expense.ID,
-				OwedTo: expense.PaidBy,
+				OwedTo:    expense.PaidBy,
 				OwedBy: uuid.NullUUID{
 					UUID:  u.ID,
 					Valid: true,
