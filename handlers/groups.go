@@ -12,7 +12,7 @@ import (
 	"github.com/matt-horst/split-ways/internal/database"
 )
 
-type exportUser struct {
+type ExportUser struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
@@ -257,10 +257,10 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	sanitizedUsers := make([]exportUser, len(users))
+	sanitizedUsers := make([]ExportUser, len(users))
 
 	for i, user := range users {
-		sanitizedUsers[i] = exportUser{
+		sanitizedUsers[i] = ExportUser{
 			ID:        user.ID,
 			Username:  user.Username,
 			CreatedAt: user.CreatedAt,

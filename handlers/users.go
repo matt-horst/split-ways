@@ -69,7 +69,19 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Couldn't set bearer token: %v\n", err)
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(
+		ExportUser{
+			ID: user.ID,
+			Username: user.Username,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
+	); err != nil {
+			log.Printf("couldn't write response body: %v\n", err)
+			return
+	}
 }
 
 func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
