@@ -10,6 +10,20 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: split_ways_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Check out code
@@ -19,6 +33,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.25.3"
+
+      - name: Set up goose
+        uses: mscno/setup-goose@v1
+        with:
+          version: latest
+      
+      - name: Run goose migrations
+        run: goose postgres "postgresql://postgres:postgres@localhost:5432/split_ways_test" -dir sql/schema up
 
       - name: Runs go unit tests
         run: go test -cover ./...
