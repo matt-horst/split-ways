@@ -27,17 +27,10 @@ func TestCreateUser(t *testing.T) {
 		JwtKey:  jwtKey,
 	}
 	// Test successful creation of user
-	type createUserData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
-	data := createUserData{
+	body, err := json.Marshal(handlers.CreateUserData{
 		Username: "user",
 		Password: "password",
-	}
-
-	body, err := json.Marshal(data)
+	})
 	require.NoError(t, err)
 
 	r := httptest.NewRequest("POST", "/api/users", bytes.NewBuffer(body))
@@ -69,17 +62,10 @@ func TestHandlerLogin(t *testing.T) {
 		JwtKey:  jwtKey,
 	}
 
-	type userData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
-	data := userData{
+	body, err := json.Marshal(handlers.CreateUserData{
 		Username: "user",
 		Password: "password",
-	}
-
-	body, err := json.Marshal(data)
+	})
 	require.NoError(t, err)
 
 	r := httptest.NewRequest("POST", "/api/users", bytes.NewBuffer(body))
@@ -100,12 +86,10 @@ func TestHandlerLogin(t *testing.T) {
 	assert.NotEmpty(t, cookies)
 
 	// Test login with wrong password
-	data = userData{
+	body, err = json.Marshal(handlers.LoginUserData{
 		Username: "user",
 		Password: "incorrect_password",
-	}
-
-	body, err = json.Marshal(data)
+	})
 	assert.NoError(t, err)
 
 	r = httptest.NewRequest("POST", "/api/login", bytes.NewBuffer(body))
@@ -116,12 +100,10 @@ func TestHandlerLogin(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, rr.Code)
 
 	// Test login with wrong username
-	data = userData{
+	body, err = json.Marshal(handlers.LoginUserData{
 		Username: "incorrect_user",
 		Password: "password",
-	}
-
-	body, err = json.Marshal(data)
+	})
 	assert.NoError(t, err)
 
 	r = httptest.NewRequest("POST", "/api/login", bytes.NewBuffer(body))
@@ -145,17 +127,10 @@ func TestUpdateUser(t *testing.T) {
 		JwtKey:  jwtKey,
 	}
 
-	type userData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
-	data := userData{
+	body, err := json.Marshal(handlers.CreateUserData{
 		Username: "user",
 		Password: "password",
-	}
-
-	body, err := json.Marshal(data)
+	})
 	require.NoError(t, err)
 
 	r := httptest.NewRequest("POST", "/api/users", bytes.NewBuffer(body))
@@ -173,11 +148,7 @@ func TestUpdateUser(t *testing.T) {
 	cookies := rr.Result().Cookies()
 
 	// Test successful update
-	type updateUserData struct {
-		Password string `json:"password"`
-	}
-
-	body, err = json.Marshal(updateUserData{Password: "new_password"})
+	body, err = json.Marshal(handlers.UpdateUserData{Password: "new_password"})
 	assert.NoError(t, err)
 
 	r = httptest.NewRequest("PUT", "/api/users", bytes.NewBuffer(body))

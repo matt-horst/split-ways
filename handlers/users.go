@@ -18,11 +18,22 @@ const (
 	userContextKey contextKey = "user"
 )
 
+type CreateUserData struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginUserData struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UpdateUserData struct {
+	Password string `json:"password"`
+}
+
 func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}{}
+	data := CreateUserData{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -73,22 +84,19 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(
 		ExportUser{
-			ID: user.ID,
-			Username: user.Username,
+			ID:        user.ID,
+			Username:  user.Username,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 		},
 	); err != nil {
-			log.Printf("couldn't write response body: %v\n", err)
-			return
+		log.Printf("couldn't write response body: %v\n", err)
+		return
 	}
 }
 
 func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}{}
+	data := LoginUserData{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -151,9 +159,7 @@ func (cfg *Config) HandlerLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *Config) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Password string `json:"password"`
-	}{}
+	data := UpdateUserData{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {

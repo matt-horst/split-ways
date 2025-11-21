@@ -19,6 +19,22 @@ type ExportUser struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type CreateGroupData struct {
+	Name string `json:"name"`
+}
+
+type UpdateGroupData struct {
+	Name string `json:"name"`
+}
+
+type AddUserToGroupData struct {
+	Username string `json:"username"`
+}
+
+type RemoveUserFromGroupData struct {
+	ID uuid.UUID `json:"id"`
+}
+
 func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(userContextKey).(database.User)
 	if !ok {
@@ -27,9 +43,7 @@ func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		Name string `json:"name"`
-	}{}
+	data := CreateGroupData{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -107,26 +121,29 @@ func (cfg *Config) HandlerUpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		Name string `json:"name"`
-	}{}
+	data := UpdateGroupData{}
 
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		log.Printf("Couldn't decode group data: %v\n", err)
+		log.Printf("Couldn't decode request body: %v\n", err)
 		http.Error(w, "Couldn't create group", http.StatusBadRequest)
 		return
 	}
 
-	if _, err := cfg.Queries.UpdateGroupName(
+	group, err = cfg.Queries.UpdateGroupName(
 		r.Context(),
 		database.UpdateGroupNameParams{ID: groupID, Name: data.Name},
-	); err != nil {
+	)
+	if err != nil {
 		log.Printf("Couldn't update group: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(group); err != nil {
+		log.Printf("couldn't write response body: %v\n", err)
+	}
 }
 
 func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request) {
@@ -165,9 +182,7 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	data := struct {
-		Username string `json:"username"`
-	}{}
+	data := AddUserToGroupData{}
 
 	err = json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -313,9 +328,7 @@ func (cfg *Config) HandlerRemoveUserFromGroup(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	data := struct {
-		ID uuid.UUID `json:"id"`
-	}{}
+	data := RemoveUserFromGroupData{}
 
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		log.Printf("Couldn't decode request body: %v\n", err)

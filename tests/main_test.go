@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/matt-horst/split-ways/internal/database"
 	"github.com/matt-horst/split-ways/internal/api"
+	"github.com/matt-horst/split-ways/internal/database"
 
 	_ "github.com/lib/pq"
 )
