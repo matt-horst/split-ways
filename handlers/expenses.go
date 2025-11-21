@@ -34,7 +34,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if _, err = cfg.Db.GetUserGroup(
+	if _, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -60,14 +60,14 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 
 	paidBy := uuid.NullUUID{Valid: true, UUID: user.ID}
 	if data.PaidBy != "" {
-		paidByUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+		paidByUser, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidBy)
 		if err != nil {
 			log.Printf("Couldn't find user: %v\n", err)
 			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidBy), http.StatusBadRequest)
 			return
 		}
 
-		if _, err := cfg.Db.GetUserGroup(
+		if _, err := cfg.Queries.GetUserGroup(
 			r.Context(),
 			database.GetUserGroupParams{GroupID: groupID, UserID: paidByUser.ID},
 		); err != nil {
@@ -79,7 +79,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		paidBy.UUID = paidByUser.ID
 	}
 
-	transaction, err := cfg.Db.CreateTransaction(
+	transaction, err := cfg.Queries.CreateTransaction(
 		r.Context(),
 		database.CreateTransactionParams{
 			GroupID: groupID,
@@ -96,7 +96,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	expense, err := cfg.Db.CreateExpense(
+	expense, err := cfg.Queries.CreateExpense(
 		r.Context(),
 		database.CreateExpenseParams{
 			TransactionID: transaction.ID,
@@ -111,7 +111,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	users, err := cfg.Db.GetUsersByGroup(r.Context(), groupID)
+	users, err := cfg.Queries.GetUsersByGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't get users in group: %v", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -125,7 +125,7 @@ func (cfg *Config) HandlerCreateExpense(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		_, err = cfg.Db.CreateDebt(
+		_, err = cfg.Queries.CreateDebt(
 			r.Context(),
 			database.CreateDebtParams{
 				ExpenseID: expense.ID,
@@ -169,7 +169,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	tx, err := cfg.Db.GetTransaction(r.Context(), id)
+	tx, err := cfg.Queries.GetTransaction(r.Context(), id)
 	if err != nil {
 		log.Printf("Couldn't get transaction: %v\n", err)
 		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
@@ -182,7 +182,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	expense, err := cfg.Db.GetExpenseByTransaction(r.Context(), tx.ID)
+	expense, err := cfg.Queries.GetExpenseByTransaction(r.Context(), tx.ID)
 	if err != nil {
 		log.Printf("Couldn't find expense by transaction: %v\n", err)
 		http.Error(w, "Couldn't find expense", http.StatusBadRequest)
@@ -210,7 +210,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 
 	paidByID := expense.PaidBy
 	if data.PaidBy != "" {
-		paidBy, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+		paidBy, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidBy)
 		if err != nil {
 			log.Printf("Couldn't find user: %v\n", err)
 			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidBy), http.StatusBadRequest)
@@ -221,7 +221,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 		paidByID.UUID = paidBy.ID
 	}
 
-	expense, err = cfg.Db.UpdateExpense(
+	expense, err = cfg.Queries.UpdateExpense(
 		r.Context(),
 		database.UpdateExpenseParams{
 			ID:          expense.ID,
@@ -236,7 +236,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	usersInGroup, err := cfg.Db.GetUsersByGroup(r.Context(), tx.GroupID)
+	usersInGroup, err := cfg.Queries.GetUsersByGroup(r.Context(), tx.GroupID)
 	if err != nil {
 		log.Printf("Couldn't get users in group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -245,7 +245,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 
 	debtAmount := expense.Amount.Div(decimal.NewFromInt(int64(len(usersInGroup))))
 
-	if err := cfg.Db.DeleteDebtsByExpense(r.Context(), expense.ID); err != nil {
+	if err := cfg.Queries.DeleteDebtsByExpense(r.Context(), expense.ID); err != nil {
 		log.Printf("Couldn't delete debts for expense: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
@@ -256,7 +256,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		if _, err := cfg.Db.CreateDebt(
+		if _, err := cfg.Queries.CreateDebt(
 			r.Context(),
 			database.CreateDebtParams{
 				ExpenseID: expense.ID,
@@ -271,7 +271,7 @@ func (cfg *Config) HandlerUpdateExpense(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	if _, err := cfg.Db.UpdateTransaction(r.Context(), tx.ID); err != nil {
+	if _, err := cfg.Queries.UpdateTransaction(r.Context(), tx.ID); err != nil {
 		log.Printf("Couldn't update transaction: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

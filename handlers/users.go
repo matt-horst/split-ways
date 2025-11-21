@@ -39,7 +39,7 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.Db.CreateUser(
+	user, err := cfg.Queries.CreateUser(
 		r.Context(),
 		database.CreateUserParams{
 			Username:       data.Username,
@@ -86,7 +86,7 @@ func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.Db.GetUserByUsername(r.Context(), data.Username)
+	user, err := cfg.Queries.GetUserByUsername(r.Context(), data.Username)
 	if err != nil {
 		log.Printf("Couldn't find user: %v\n", err)
 		http.Error(w, "Couldn't find user", http.StatusBadRequest)
@@ -165,7 +165,7 @@ func (cfg *Config) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = cfg.Db.UpdatePassword(r.Context(), database.UpdatePasswordParams{
+	_, err = cfg.Queries.UpdatePassword(r.Context(), database.UpdatePasswordParams{
 		ID:             user.ID,
 		HashedPassword: hashedPassword,
 	})
@@ -186,7 +186,7 @@ func (cfg *Config) HandlerDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groups, err := cfg.Db.GetGroupsByUser(r.Context(), user.ID)
+	groups, err := cfg.Queries.GetGroupsByUser(r.Context(), user.ID)
 	if err != nil {
 		log.Printf("Couldn't find groups by user: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -214,7 +214,7 @@ func (cfg *Config) AuthenticatedUserMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := cfg.Db.GetUserByID(r.Context(), userID)
+		user, err := cfg.Queries.GetUserByID(r.Context(), userID)
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return

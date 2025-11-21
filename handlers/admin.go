@@ -4,17 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/matt-horst/split-ways/internal/api"
 )
 
 func (cfg *Config) HandlerReset(w http.ResponseWriter, r *http.Request) {
-	if err := cfg.Db.DeleteAllGroups(r.Context()); err != nil {
-		log.Printf("Couldn't delete groups: %v\n", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	if err := cfg.Db.DeleteAllUsers(r.Context()); err != nil {
-		log.Printf("Couldn't delete users: %v\n", err)
+	if err := api.Reset(r.Context(), cfg.DB, cfg.Queries); err != nil {
+		log.Printf("couldn't reset database: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}

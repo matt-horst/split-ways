@@ -38,7 +38,7 @@ func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := cfg.Db.CreateGroup(
+	group, err := cfg.Queries.CreateGroup(
 		r.Context(),
 		database.CreateGroupParams{
 			Name:  data.Name,
@@ -50,7 +50,7 @@ func (cfg *Config) HandlerCreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = cfg.Db.CreateUserGroup(
+	_, err = cfg.Queries.CreateUserGroup(
 		r.Context(),
 		database.CreateUserGroupParams{
 			UserID:  user.ID,
@@ -94,7 +94,7 @@ func (cfg *Config) HandlerUpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -117,7 +117,7 @@ func (cfg *Config) HandlerUpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := cfg.Db.UpdateGroupName(
+	if _, err := cfg.Queries.UpdateGroupName(
 		r.Context(),
 		database.UpdateGroupNameParams{ID: groupID, Name: data.Name},
 	); err != nil {
@@ -152,7 +152,7 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -176,14 +176,14 @@ func (cfg *Config) HandlerAddUserToGroup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	addUser, err := cfg.Db.GetUserByUsername(r.Context(), data.Username)
+	addUser, err := cfg.Queries.GetUserByUsername(r.Context(), data.Username)
 	if err != nil {
 		log.Printf("Couldn't find user: %v\n", err)
 		http.Error(w, "Couldn't find user", http.StatusBadRequest)
 		return
 	}
 
-	_, err = cfg.Db.CreateUserGroup(
+	_, err = cfg.Queries.CreateUserGroup(
 		r.Context(),
 		database.CreateUserGroupParams{
 			UserID:  addUser.ID,
@@ -234,7 +234,7 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -247,7 +247,7 @@ func (cfg *Config) HandlerGetGroupUsers(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	users, err := cfg.Db.GetUsersByGroup(
+	users, err := cfg.Queries.GetUsersByGroup(
 		r.Context(),
 		groupID,
 	)
@@ -300,7 +300,7 @@ func (cfg *Config) HandlerRemoveUserFromGroup(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -323,7 +323,7 @@ func (cfg *Config) HandlerRemoveUserFromGroup(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if _, err := cfg.Db.DeleteUserGroup(r.Context(), database.DeleteUserGroupParams{UserID: data.ID, GroupID: groupID}); err != nil {
+	if _, err := cfg.Queries.DeleteUserGroup(r.Context(), database.DeleteUserGroupParams{UserID: data.ID, GroupID: groupID}); err != nil {
 		log.Printf("Couln't remove user from group; user not in group: %v\n", err)
 		http.Error(w, "User not in group", http.StatusBadRequest)
 		return
@@ -354,7 +354,7 @@ func (cfg *Config) HandlerDeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -367,7 +367,7 @@ func (cfg *Config) HandlerDeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := cfg.Db.DeleteGroup(r.Context(), groupID); err != nil {
+	if _, err := cfg.Queries.DeleteGroup(r.Context(), groupID); err != nil {
 		log.Printf("Couldn't delete group: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

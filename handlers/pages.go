@@ -34,7 +34,7 @@ func (cfg *Config) HandlerManageGroupPage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -47,14 +47,14 @@ func (cfg *Config) HandlerManageGroupPage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
 		return
 	}
 
-	members, err := cfg.Db.GetUsersByGroup(r.Context(), groupID)
+	members, err := cfg.Queries.GetUsersByGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group members: %v\n", err)
 		http.Error(w, "Couldn't find group members", http.StatusBadRequest)
@@ -86,7 +86,7 @@ func (cfg *Config) HandlerCreateExpensePage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -99,7 +99,7 @@ func (cfg *Config) HandlerCreateExpensePage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -131,7 +131,7 @@ func (cfg *Config) HandlerCreatePaymentPage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -144,7 +144,7 @@ func (cfg *Config) HandlerCreatePaymentPage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -176,7 +176,7 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -189,21 +189,21 @@ func (cfg *Config) HandlerGroupPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	txs, err := accounting.GetTransationsByGroup(cfg.Db, r.Context(), groupID)
+	txs, err := accounting.GetTransationsByGroup(cfg.Queries, r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't get transactions by group: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	bs, err := accounting.GetBalanceForGroup(cfg.Db, r.Context(), groupID, user.ID)
+	bs, err := accounting.GetBalanceForGroup(cfg.Queries, r.Context(), groupID, user.ID)
 	if err != nil {
 		log.Printf("Couldn't get balance for group: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), groupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), groupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Somehting went wrong", http.StatusInternalServerError)
@@ -229,7 +229,7 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx, err := cfg.Db.GetTransaction(r.Context(), id)
+	tx, err := cfg.Queries.GetTransaction(r.Context(), id)
 	if err != nil {
 		log.Printf("Couldn't find transaction: %v\n", err)
 		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
@@ -242,7 +242,7 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := cfg.Db.GetGroup(r.Context(), tx.GroupID)
+	group, err := cfg.Queries.GetGroup(r.Context(), tx.GroupID)
 	if err != nil {
 		log.Printf("Couldn't find group: %v\n", err)
 		http.Error(w, "Couldn't find group", http.StatusBadRequest)
@@ -251,7 +251,7 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 
 	switch tx.Kind {
 	case "expense":
-		expense, err := cfg.Db.GetExpenseByTransaction(r.Context(), tx.ID)
+		expense, err := cfg.Queries.GetExpenseByTransaction(r.Context(), tx.ID)
 		if err != nil {
 			log.Printf("Couldn't find expense by transaction: %v\n", err)
 			http.Error(w, "Couldn't find expense", http.StatusBadRequest)
@@ -264,7 +264,7 @@ func (cfg *Config) HandlerEditPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "payment":
-		payment, err := cfg.Db.GetPaymentByTransaction(r.Context(), tx.ID)
+		payment, err := cfg.Queries.GetPaymentByTransaction(r.Context(), tx.ID)
 		if err != nil {
 			log.Printf("Couldn't find payment by transaction: %v\n", err)
 			http.Error(w, "Couldn't find payment", http.StatusBadRequest)

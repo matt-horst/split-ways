@@ -32,7 +32,7 @@ func (cfg *Config) HandlerDeleteTransaction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -55,7 +55,7 @@ func (cfg *Config) HandlerDeleteTransaction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	tx, err := cfg.Db.GetTransaction(r.Context(), data.ID)
+	tx, err := cfg.Queries.GetTransaction(r.Context(), data.ID)
 	if err != nil {
 		log.Printf("Couldn't find transaction: %v\n", err)
 		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
@@ -68,7 +68,7 @@ func (cfg *Config) HandlerDeleteTransaction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := cfg.Db.DeleteTransaction(r.Context(), data.ID); err != nil {
+	if err := cfg.Queries.DeleteTransaction(r.Context(), data.ID); err != nil {
 		log.Printf("Couldn't delete transaction: %v\n", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return

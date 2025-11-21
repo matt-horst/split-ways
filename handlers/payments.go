@@ -34,7 +34,7 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  user.ID,
@@ -60,21 +60,21 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	paidBy, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+	paidBy, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidBy)
 	if err != nil {
 		log.Printf("Couldn't find paid by user: %v\n", err)
 		http.Error(w, fmt.Sprintf("Couldn't find user `%v`", data.PaidBy), http.StatusBadRequest)
 		return
 	}
 
-	paidTo, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidTo)
+	paidTo, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidTo)
 	if err != nil {
 		log.Printf("Couldn't find paid by user: %v\n", err)
 		http.Error(w, fmt.Sprintf("Couldn't find user `%v`", data.PaidTo), http.StatusBadRequest)
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  paidBy.ID,
@@ -87,7 +87,7 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = cfg.Db.GetUserGroup(
+	_, err = cfg.Queries.GetUserGroup(
 		r.Context(),
 		database.GetUserGroupParams{
 			UserID:  paidTo.ID,
@@ -100,7 +100,7 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	transaction, err := cfg.Db.CreateTransaction(
+	transaction, err := cfg.Queries.CreateTransaction(
 		r.Context(),
 		database.CreateTransactionParams{
 			GroupID: groupID,
@@ -117,7 +117,7 @@ func (cfg *Config) HandlerCreatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	payment, err := cfg.Db.CreatePayment(
+	payment, err := cfg.Queries.CreatePayment(
 		r.Context(),
 		database.CreatePaymentParams{
 			TransactionID: transaction.ID,
@@ -163,7 +163,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	tx, err := cfg.Db.GetTransaction(r.Context(), txID)
+	tx, err := cfg.Queries.GetTransaction(r.Context(), txID)
 	if err != nil {
 		log.Printf("Couldn't find transaction: %v\n", err)
 		http.Error(w, "Couldn't find transaction", http.StatusBadRequest)
@@ -176,7 +176,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	payment, err := cfg.Db.GetPaymentByTransaction(r.Context(), txID)
+	payment, err := cfg.Queries.GetPaymentByTransaction(r.Context(), txID)
 	if err != nil {
 		log.Printf("Couldn't find payment: %v\n", err)
 		http.Error(w, "Couldn't find payment", http.StatusBadRequest)
@@ -197,7 +197,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 
 	paidBy := payment.PaidBy
 	if data.PaidBy != "" {
-		paidByUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidBy)
+		paidByUser, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidBy)
 		if err != nil {
 			log.Printf("Couln't find user: %v\n", err)
 			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidBy), http.StatusBadRequest)
@@ -210,7 +210,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 
 	paidTo := payment.PaidTo
 	if data.PaidTo != "" {
-		paidToUser, err := cfg.Db.GetUserByUsername(r.Context(), data.PaidTo)
+		paidToUser, err := cfg.Queries.GetUserByUsername(r.Context(), data.PaidTo)
 		if err != nil {
 			log.Printf("Couln't find user: %v\n", err)
 			http.Error(w, fmt.Sprintf("Couldn't find user %s", data.PaidTo), http.StatusBadRequest)
@@ -225,7 +225,7 @@ func (cfg *Config) HandlerUpdatePayment(w http.ResponseWriter, r *http.Request) 
 		data.Amount = payment.Amount
 	}
 
-	payment, err = cfg.Db.UpdatePayment(
+	payment, err = cfg.Queries.UpdatePayment(
 		r.Context(),
 		database.UpdatePaymentParams{
 			ID:     payment.ID,

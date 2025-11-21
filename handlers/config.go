@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"database/sql"
 	"github.com/gorilla/sessions"
 	"github.com/matt-horst/split-ways/internal/database"
 )
 
 type Config struct {
-	Db     *database.Queries
-	Store  *sessions.CookieStore
-	JwtKey string
+	DB      *sql.DB
+	Queries *database.Queries
+	Store   *sessions.CookieStore
+	JwtKey  string
 }

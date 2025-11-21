@@ -47,23 +47,24 @@ func main() {
 		log.Fatalln("Couldn't find jwt key in ENV")
 	}
 
-	dbConn, err := sql.Open("postgres", dbConnStr)
+	db, err := sql.Open("postgres", dbConnStr)
 	if err != nil {
 		log.Fatalf("Couldn't open database connection: %v\n", err)
 	}
 
-	db := database.New(dbConn)
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	if err := dbConn.PingContext(ctx); err != nil {
+	if err := db.PingContext(ctx); err != nil {
 		log.Fatalf("Couldn't establish database connection: %v\n", err)
 	}
 	cancel()
 
+	queries := database.New(db)
+
 	cfg := &handlers.Config{
-		Db:     db,
-		Store:  sessions.NewCookieStore([]byte(sessionKey)),
-		JwtKey: jwtKey,
+		DB:      db,
+		Queries: queries,
+		Store:   sessions.NewCookieStore([]byte(sessionKey)),
+		JwtKey:  jwtKey,
 	}
 
 	router := mux.NewRouter()
