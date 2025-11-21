@@ -10,7 +10,6 @@ import (
 
 	"github.com/matt-horst/split-ways/internal/auth"
 	"github.com/matt-horst/split-ways/internal/database"
-	"github.com/matt-horst/split-ways/web/pages"
 )
 
 type contextKey string
@@ -176,28 +175,6 @@ func (cfg *Config) HandlerUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (cfg *Config) HandlerDashboard(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value(userContextKey).(database.User)
-	if !ok {
-		log.Printf("Attempted to handle dashboard with unauthenticated user\n")
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
-
-	groups, err := cfg.Queries.GetGroupsByUser(r.Context(), user.ID)
-	if err != nil {
-		log.Printf("Couldn't find groups by user: %v\n", err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
-		return
-	}
-
-	err = pages.Dashboard(user.Username, groups).Render(r.Context(), w)
-	if err != nil {
-		log.Printf("Couldn't send page: %v\n", err)
-		return
-	}
 }
 
 func (cfg *Config) AuthenticatedUserMiddleware(next http.Handler) http.Handler {
