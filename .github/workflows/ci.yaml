@@ -37,7 +37,7 @@ jobs:
       - name: Set up goose
         uses: mscno/setup-goose@v1
         with:
-          version: latest
+          version: v3.26.0
       
       - name: Run goose migrations
         run: goose postgres "postgresql://postgres:postgres@localhost:5432/split_ways_test" -dir sql/schema up
