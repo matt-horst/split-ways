@@ -24,10 +24,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var cfg *handlers.Config
+var db *sql.DB
+var queries *database.Queries
+
+const sessionKey string = "session_key"
+const jwtKey string = "jwt_key"
 
 func TestMain(m *testing.M) {
-	db, err := sql.Open("postgres", "postgresql://postgres:postgres@localhost:5432/split_ways_test?sslmode=disable")
+	var err error
+	db, err = sql.Open("postgres", "postgresql://postgres:postgres@localhost:5432/split_ways_test?sslmode=disable")
 	if err != nil {
 		log.Fatalf("could not connect to database: %v\n", err)
 	}
@@ -37,18 +42,10 @@ func TestMain(m *testing.M) {
 		log.Fatalf("could not ping database: %v\n", err)
 	}
 
-	queries := database.New(db)
-
-	cfg = &handlers.Config{
-		DB:     db,
-		Queries: queries,
-		Store:  sessions.NewCookieStore([]byte("session_key")),
-		JwtKey: "jwt_key",
-	}
+	queries = database.New(db)
 
 	exitCode := m.Run()
 
-	// TODO: Reset database in teardown
 	if err := api.Reset(context.Background(), db, queries); err != nil {
 		log.Fatalf("could not clean up test database: %v\n", err)
 	}
@@ -57,6 +54,16 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreateUser(t *testing.T) {
+	tx, err := db.Begin()
+	require.NoError(t, err)
+	defer tx.Rollback()
+
+	cfg := &handlers.Config{
+		DB:      db,
+		Queries: queries.WithTx(tx),
+		Store:   sessions.NewCookieStore([]byte(sessionKey)),
+		JwtKey:  jwtKey,
+	}
 	// Test successful creation of user
 	type createUserData struct {
 		Username string `json:"username"`
