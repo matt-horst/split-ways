@@ -88,7 +88,7 @@ func (cfg *Config) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	user, err := cfg.Queries.GetUserByUsername(r.Context(), data.Username)
 	if err != nil {
 		log.Printf("Couldn't find user: %v\n", err)
-		http.Error(w, "Couldn't find user", http.StatusBadRequest)
+		http.Error(w, "Couldn't find user", http.StatusUnauthorized)
 		return
 	}
 

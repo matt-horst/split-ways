@@ -42,7 +42,7 @@ jobs:
       - name: Run goose migrations
         run: goose postgres "postgresql://postgres:postgres@localhost:5432/split_ways_test" -dir sql/schema up
 
-      - name: Runs go unit tests
+      - name: Runs go unit / integration tests
         run: go test -cover ./...
 
       - name: Sets up gosec
@@ -60,7 +60,6 @@ jobs:
 
       - name: Run sqlc vet
         run: sqlc vet
-          
 
   style:
     name: Style
