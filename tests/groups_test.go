@@ -24,6 +24,7 @@ func TestCreateGroup(t *testing.T) {
 
 	cfg := &handlers.Config{
 		DB:      db,
+		Tx:      tx,
 		Queries: queries.WithTx(tx),
 		Store:   sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey:  jwtKey,
@@ -99,6 +100,7 @@ func TestUpdateGroup(t *testing.T) {
 
 	cfg := &handlers.Config{
 		DB:      db,
+		Tx:      tx,
 		Queries: queries.WithTx(tx),
 		Store:   sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey:  jwtKey,
@@ -169,6 +171,7 @@ func TestUpdateGroup(t *testing.T) {
 	body, err = json.Marshal(handlers.UpdateGroupData{
 		Name: newGroupName,
 	})
+	assert.NoError(t, err)
 
 	r = httptest.NewRequest("PUT", "/api/groups/"+group.ID.String(), bytes.NewBuffer(body))
 	r.AddCookie(jwt)

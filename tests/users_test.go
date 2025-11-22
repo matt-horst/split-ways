@@ -22,6 +22,7 @@ func TestCreateUser(t *testing.T) {
 
 	cfg := &handlers.Config{
 		DB:      db,
+		Tx:      tx,
 		Queries: queries.WithTx(tx),
 		Store:   sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey:  jwtKey,
@@ -57,6 +58,7 @@ func TestHandlerLogin(t *testing.T) {
 
 	cfg := &handlers.Config{
 		DB:      db,
+		Tx:      tx,
 		Queries: queries.WithTx(tx),
 		Store:   sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey:  jwtKey,
@@ -122,6 +124,7 @@ func TestUpdateUser(t *testing.T) {
 
 	cfg := &handlers.Config{
 		DB:      db,
+		Tx:      tx,
 		Queries: queries.WithTx(tx),
 		Store:   sessions.NewCookieStore([]byte(sessionKey)),
 		JwtKey:  jwtKey,

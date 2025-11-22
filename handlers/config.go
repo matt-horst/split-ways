@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	DB      *sql.DB
+	Tx      *sql.Tx
 	Queries *database.Queries
 	Store   *sessions.CookieStore
 	JwtKey  string
