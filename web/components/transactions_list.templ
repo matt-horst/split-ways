@@ -9,7 +9,7 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
 	<ul class="transactions-list">
 		for _, t := range ts {
 			<li class="transaction-item">
-                <div class="transaction-icon">
+                <div class="tx-icon">
 				switch t.Kind {
 					case accounting.ExpenseKind:
 						@ExpenseIcon()
@@ -57,11 +57,11 @@ templ TransactionsList(user database.User, ts []accounting.Transaction) {
 				<div class="transaction-actions">
 					if t.CreatedBy != nil && t.CreatedBy.ID == user.ID {
 						<!-- Edit button -->
-						<button class="icon-btn btn-edit" data-id={ t.ID.String() } aria-label="Edit">
+						<button class="icon-btn btn-accent" data-id={ t.ID.String() } aria-label="Edit">
 							@EditIcon()
 						</button>
 						<!-- Delete button -->
-						<button class="icon-btn btn-delete" data-id={ t.ID.String() } aria-label="Delete">
+						<button class="icon-btn btn-danger" data-id={ t.ID.String() } aria-label="Delete">
 							@DeleteIcon()
 						</button>
 					} else {

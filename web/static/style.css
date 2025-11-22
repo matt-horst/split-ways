@@ -1,4 +1,4 @@
-/* === Global Styles === */
+/* ===== THEME VARIABLES ===== */
 :root {
   --bg-color: #121212;
   --card-bg: #1e1e1e;
@@ -8,176 +8,105 @@
   --text-muted: #a0a0a0;
   --border-color: #333;
   --error-color: #ff5c5c;
+
   --radius: 12px;
   --transition: 0.2s ease;
 }
 
+/* ===== RESET ===== */
 * {
   box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
   margin: 0;
-  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
 }
 
-/* === Card === */
+body, html {
+  height: 100%;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: Inter, Segoe UI, Roboto, sans-serif;
+}
+
+/* ===== LAYOUT HELPERS ===== */
+.flex { display: flex; }
+.center { display: flex; justify-content: center; align-items: center; }
+
+/* ===== CARDS ===== */
 .card {
-  background-color: var(--card-bg);
+  background: var(--card-bg);
   padding: 2.5rem;
   border-radius: var(--radius);
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
-  width: 100%;
-  max-width: 380px;
-  text-align: center;
   border: 1px solid var(--border-color);
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  max-width: 380px;
+  margin: auto;
+
+  margin-top: 4rem;
+  margin-bottom: 2rem;
 }
 
-/* === Header === */
+/* ===== HEADINGS ===== */
 h1 {
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
   color: var(--accent);
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
-/* === Form === */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+h2 {
+  color: var(--text);
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  text-align: center;
 }
+
+/* ===== FORMS ===== */
+form { display: flex; flex-direction: column; gap: 1rem; }
 
 input {
   background: #2a2a2a;
-  color: var(--text-color);
   border: 1px solid var(--border-color);
-  padding: 0.8rem 1rem;
+  padding: 0.85rem 1rem;
   border-radius: var(--radius);
-  font-size: 1rem;
-  transition: border-color var(--transition), background var(--transition);
-}
-
-input::placeholder {
-  color: var(--text-muted);
+  color: var(--text-color);
+  transition: var(--transition);
 }
 
 input:focus {
-  outline: none;
-  border-color: var(--accent);
   background: #252525;
+  border-color: var(--accent);
 }
 
-/* === Button === */
-button {
-  background-color: var(--accent);
-  color: white;
+/* ===== BUTTONS ===== */
+
+.btn {
   border: none;
   border-radius: var(--radius);
-  padding: 0.8rem;
-  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color var(--transition), transform var(--transition);
-}
-
-button:hover {
-  background-color: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-/* === Status Message === */
-.status {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: var(--error-color);
-}
-
-/* === Responsive === */
-@media (max-width: 480px) {
-  .card {
-    margin: 1rem;
-    padding: 2rem;
-  }
-}
-
-/* === Transaction List === */
-.transactions-list {
-  list-style: none;
-  padding: 0;
-  margin: 2rem 0;
-  width: 100%;
-  max-width: 600px;
-}
-
-.transaction-item {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: var(--radius);
-  background: #1a1a1a;
-  border: 1px solid var(--border-color);
-  align-items: center;
   transition: background var(--transition), transform var(--transition);
 }
 
-.transaction-item:hover {
-  background: #222;
-  transform: translateY(-1px);
+.btn:hover { transform: translateY(-1px); }
+
+/* Accent / Primary */
+.btn-accent {
+  background: var(--accent);
+  color: white;
 }
 
-.transaction-icon svg {
-  width: 26px;
-  height: 26px;
-  opacity: 0.9;
+.btn-accent:hover { background: var(--accent-hover); }
+
+/* Danger */
+.btn-danger {
+  background: var(--error-color);
+  color: white;
 }
 
-.transaction-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
+.btn-danger:hover { background: #ff7777; }
 
-.transaction-date {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  letter-spacing: 0.3px;
-}
-
-.transaction-text {
-    font-size: 0.95rem;
-    line-height: 1.4;
-}
-
-/* === Action Buttons === */
-.transaction-actions {
-  display: flex;
-  gap: 0.4rem;
-  width: 60px;
-  justify-content: flex-end;
-}
-
-.btn-edit,
-.btn-delete {
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background-color var(--transition), transform var(--transition);
-}
-
-/* === Icon Buttons === */
+/* Icon buttons */
 .icon-btn {
   background: none;
   border: none;
@@ -186,462 +115,325 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  transition: var(--transition);
 }
 
-/* Edit icon = accent color */
-.btn-edit svg {
-  color: var(--accent);
+.icon-btn:hover { transform: translateY(-1px); }
+
+/* Accent icon */
+.icon-btn.btn-accent svg { color: var(--accent); }
+.icon-btn.btn-accent:hover { background: rgba(78,156,255,0.15); }
+
+/* Danger icon */
+.icon-btn.btn-danger svg { color: var(--error-color); }
+.icon-btn.btn-danger:hover { background: rgba(255,92,92,0.15); }
+
+/* Placeholder to keep spacing aligned */
+.icon-placeholder {
+    width: 24px;
+    height: 24px;
+    opacity: 0;
 }
 
-.btn-edit:hover {
-  background: rgba(78, 156, 255, 0.15);
-  transform: translateY(-1px);
-}
+/* ===== LISTS ===== */
+ul { list-style: none; }
 
-/* Delete icon = danger color */
-.btn-delete svg {
-  color: var(--error-color);
-}
-
-.btn-delete:hover {
-  background: rgba(255, 92, 92, 0.15);
-  transform: translateY(-1px);
-}
-
-.tx-icon {
-  margin-right: 0.75rem;
-  flex-shrink: 0;
-  color: var(--accent);
-}
-
-.expense-icon {
-  color: #ffb74d; /* orange-ish */
-}
-
-.payment-icon {
-  color: #80ffea; /* aqua */
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.transaction-main {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
-
-/* === Action Bar (Top Buttons) === */
-.action-bar {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1.5rem 0 2rem 0;
-  flex-wrap: nowrap;
-  flex-direction: column;
-}
-
-.action-bar form {
-  margin: 0;
-}
-
-/* Base style for action buttons */
-.action-btn {
-  background-color: var(--accent);
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: var(--radius);
-  font-size: 0.95rem;
-  color: white;
-  cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
-  min-width: 150px;
-  text-align: center;
-}
-
-/* Hover effect */
-.action-btn:hover {
-  background-color: var(--accent-hover);
-  transform: translateY(-2px);
-}
-
-/* Pressed */
-.action-btn:active {
-  transform: translateY(0);
-}
-
-/* === Groups List === */
-.groups-list {
-  list-style: none;
-  padding: 0;
-  margin: 2rem 0;
+.list {
   width: 100%;
   max-width: 600px;
+  margin: 2rem auto;
 }
 
-.group-item {
+/* ===== TRANSACTIONS ===== */
+.transaction-item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: #1a1a1a;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  align-items: center;
+}
+
+.transaction-item:hover {
+  background: #222;
+  transform: translateY(-1px);
+}
+
+.tx-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Color-coded icons */
+.expense-icon { color: #ffb74d; }
+.payment-icon { color: #80ffea; }
+
+/* Body text */
+.transaction-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.transaction-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.transaction-text { font-size: 0.95rem; }
+
+/* Actions */
+.transaction-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+  width: 60px;
+}
+
+/* ===== GROUPS ===== */
+.group-item,
+.member-item {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.75rem;
+  transition: var(--transition);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
-  transition: background var(--transition), transform var(--transition);
 }
 
-.group-item:hover {
+.group-text,
+.summary-text
+{
+  font-size: 1rem;
+  color: var(--text-color)
+}
+
+.group-item:hover,
+.member-item:hover {
   background: #252525;
-  transform: translateY(-2px);
 }
 
-.group-main {
+/* ===== MEMBERS ===== */
+.group-left,
+.member-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.group-name {
-  font-size: 1rem;
-  color: var(--text-color);
-}
-
-.group-icon {
-  color: var(--accent);
-  flex-shrink: 0;
-}
-.group-open-btn {
-  background: none;
-  border: none;
-  padding: 0.4rem;
-  border-radius: var(--radius);
+.member-avatar {
+  width: 28px;
+  height: 28px;
+  background: #2d2d31;
+  border-radius: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  align-items: center;
 }
 
-.group-open-btn svg {
-  color: var(--accent);
-}
-
-.group-open-btn:hover {
-  background: rgba(78, 156, 255, 0.15);
-  transform: translateY(-1px);
-}
-
-/* Summary Section */
+/* ===== SUMMARY ===== */
 .summary {
-    margin-top: 1.5rem;
-    padding: 1.2rem 1.4rem;
-    background: #1c1c1e;
-    border: 1px solid #2a2a2d;
-    border-radius: 12px;
-}
-
-.summary h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    color: #e5e5e7;
-    border-bottom: 1px solid #2d2d30;
-    padding-bottom: .5rem;
-}
-
-.summary-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  background: #1c1c1e;
+  border: 1px solid #2a2a2d;
+  padding: 1.3rem;
+  border-radius: var(--radius);
 }
 
 .summary-item {
-    display: flex;
-    align-items: center;
-    padding: .7rem .3rem;
-    border-radius: 10px;
-    margin-bottom: .5rem;
-    background: #232326;
-    border: 1px solid #2b2b2e;
-    transition: background .2s, border-color .2s;
-}
-
-.summary-item:hover {
-    background: #2b2b2e;
-    border-color: #3a3a3d;
+  display: flex;
+  align-items: center;
+  padding: 0.7rem;
+  border-radius: 10px;
+  background: #232326;
+  border: 1px solid #2b2b2e;
+  margin-bottom: 0.5rem;
 }
 
 .summary-icon {
-    width: 22px;
-    height: 22px;
-    margin-right: .7rem;
-    color: #aaa;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  margin-right: 0.7rem;
+  opacity: 0.85;
 }
 
-.summary-text {
-    color: #e4e4e6;
-    font-size: 0.95rem;
-    text-align: left;
-}
+.amount { font-weight: 600; }
+.amount.positive { color: #4df2a7; }
+.amount.negative { color: #ff7676; }
 
-/* Color-coded amounts */
-.amount{
-    font-weight: 600;
-}
-
-.amount.positive {
-    color: #4df2a7; /* green mint */
-}
-
-.amount.negative {
-    color: #ff7676; /* warm red */
-}
-
-/* === Navbar === */
+/* ===== NAVBAR ===== */
 .navbar {
-  width: 100%;
-  padding: 0.75rem 1.2rem;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.nav-left,
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
 }
 
 .nav-item {
   color: var(--text-color);
   text-decoration: none;
-  font-size: 0.95rem;
-  padding: 0.45rem 0.8rem;
+  padding: 0.45rem 0.75rem;
   border-radius: var(--radius);
-  transition: background var(--transition), color var(--transition);
+  transition: var(--transition);
+}
+
+/* Left side (home link / brand) */
+.nav-left {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
 }
 
-.nav-item:hover {
-  background: #2a2a2a;
+/* Right side (login/logout, signup, etc.) */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.nav-home {
-  font-weight: 600;
-  color: var(--accent);
-}
+.nav-item:hover { background: #2a2a2a; }
+.nav-home { color: var(--accent); font-weight: 600; }
 
-.nav-home:hover {
-  background: #202f48;
-}
-
+/* Accent link for buttons like Sign Up */
 .nav-signup {
-  background: var(--accent);
-  color: white;
+    background: var(--accent);
+    color: white;
 }
 
 .nav-signup:hover {
-  background: var(--accent-hover);
+    background: var(--accent-hover);
 }
 
+/* Danger link for Logout */
 .nav-logout {
-  color: #ff7a7a;
+    color: var(--error-color);
 }
 
 .nav-logout:hover {
-  background: rgba(255, 90, 90, 0.15);
+    background: rgba(255, 90, 90, 0.15);
 }
-
-/* Icons */
-.nav-item svg {
-  width: 18px;
-  height: 18px;
-  stroke-width: 2;
-  opacity: 0.85;
-}
-
+                            
+/* ===== ACTIONS ===== */
+.actions,
+.user-actions,
+.transaction-actions,
+.group-actions,
 .dashboard-actions {
-  margin-bottom: 1rem;
   display: flex;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem;
 }
 
-.button-accent {
-  background: var(--accent);
-  color: white;
-  padding: 0.6rem 1rem;
+/* ===== Action Buttons (rounded, consistent) ===== */
+.action-btn,
+.action-btn.accent,
+.action-btn.danger,
+.action-btn:link,
+.action-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
   border-radius: var(--radius);
-  text-decoration: none;
   font-size: 0.95rem;
-  transition: background var(--transition), transform var(--transition);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;               /* for <button>, safe for <a> */
+  color: var(--text-color);
+  transition: background var(--transition), transform var(--transition), color var(--transition);
 }
 
-.button-accent:hover {
+/* Default accent style (primary) */
+.action-btn.accent {
+  background: var(--accent);
+  color: #fff;
+}
+.action-btn.accent:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
 }
 
-.button-accent:active {
-  transform: translateY(0);
-}
-
-/* === Members Section === */
-.members-section {
-  margin-bottom: 1.5rem;
-}
-
-.members-section h2 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  color: var(--text-color);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-}
-
-.members-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.member-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1b1b1d;
-  border: 1px solid #2a2a2c;
-  padding: 0.6rem 0.9rem;
-  border-radius: var(--radius);
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.member-item:hover {
-  background: #242427;
-  border-color: #343437;
-}
-
-.member-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #2d2d31;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.7rem;
-}
-
-.member-avatar svg {
-  width: 16px;
-  height: 16px;
-  stroke: var(--text-muted);
-  opacity: 0.9;
-}
-
-.member-name {
-  font-size: 0.95rem;
-  color: var(--text-color);
-  flex-grow: 1;
-}
-
-.divider {
-  border: none;
-  border-top: 1px solid var(--border-color);
-  margin: 1.5rem 0;
-}
-
-.user-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  justify-conteng: center;
-  width: 32px;
-}
-
-.icon-placeholder {
-    width: 18px;
-    height: 18px;
-    opacity: 0;
-    pointer-events: none;
-    padding: 0.4rem 0.7rem;
-    font-size: 0.85rem;
-}
-
-.add-user-section {
-  margin-bottom: 1.5rem;
-}
-
-.add-user-section h2 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  color: var(--text-color);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-}
-
-.rename-section {
-  margin-bottom: 1.5rem;
-}
-
-.rename-section h2 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  color: var(--text-color);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-}
-
-.delete-section {
-  margin-bottom: 1.5rem;
-}
-
-.delete-section h2 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  color: var(--error-color);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-}
-
-/* === Danger Button === */
-.button-danger,
-#button-delete {
+/* Danger variant */
+.action-btn.danger {
   background: var(--error-color);
-  color: white;
-  border: none;
-  border-radius: var(--radius);
-  padding: 0.8rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  color: #fff;
 }
-
-.button-danger:hover,
-#button-delete:hover {
-  background: #ff7777; /* slightly brighter red for hover */
+.action-btn.danger:hover {
+  background: #ff7777;
   transform: translateY(-1px);
 }
 
-.button-danger:active,
-#button-delete:active {
+/* Default form button (does NOT affect .action-btn buttons) */
+button:not(.action-btn):not(.icon-btn) {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+button:not(.action-btn):not(.icon-btn):hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+button:not(.action-btn):not(.icon-btn):active {
   transform: translateY(0);
 }
+
+/* === SECTION BLOCKS (used on Manage Group page, etc.) === */
+.section {
+    margin: 2rem 0;
+    padding: 1.75rem 1.5rem;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0.75rem;
+}
+
+.section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: var(--heading);
+}
+
+/* === Status messages === */
+.status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-align: center;       
+    min-height: 1.2em;
+    transition: opacity 0.2s ease;
+    opacity: 1;
+}
+
+.status.error {
+    color: var(--error-color)
+}
+
+.status[hidden] {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .card { padding: 2rem; }
+}
+

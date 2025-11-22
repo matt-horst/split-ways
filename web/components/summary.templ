@@ -9,7 +9,7 @@ import (
 templ Summary(balances []accounting.Balance) {
 	<section class="summary card">
 		<h2>Summary</h2>
-		<ul class="summary-list">
+		<ul class="list">
 			for _, b := range balances {
 				{{
 					cmp := b.Amount.Compare(decimal.NewFromInt(0))

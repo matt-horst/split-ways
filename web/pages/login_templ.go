@@ -47,7 +47,7 @@ func Login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<h1>Login</h1><form id=\"form\"><input id=\"input-username\" type=\"text\" placeholder=\"username\" required> <input id=\"input-password\" type=\"password\" placeholder=\"password\" required> <button id=\"button-submit\" type=\"submit\">Login</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<h1>Login</h1><form id=\"form\"><input id=\"input-username\" type=\"text\" placeholder=\"username\" required> <input id=\"input-password\" type=\"password\" placeholder=\"password\" required> <button id=\"action-btn accent\" type=\"submit\">Login</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

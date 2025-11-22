@@ -15,11 +15,11 @@ templ Group(user database.User, group database.Group, transactions []accounting.
 			<main class="card" role="main">
 				@components.Navbar(true)
 				<h1>{ group.Name }</h1>
-                <div class="action-bar">
-                    <a href={ fmt.Sprintf("/groups/%s/create-expense", group.ID.String()) } class="button-accent">Create Expense</a>
-                    <a href={ fmt.Sprintf("/groups/%s/create-payment", group.ID.String()) } class="button-accent">Create Payment</a>
+                <div class="actions">
+                    <a href={ fmt.Sprintf("/groups/%s/create-expense", group.ID.String()) } class="action-btn accent">Create Expense</a>
+                    <a href={ fmt.Sprintf("/groups/%s/create-payment", group.ID.String()) } class="action-btn accent">Create Payment</a>
                     if group.Owner == user.ID {
-                        <a href={ fmt.Sprintf("/groups/%s/manage", group.ID.String()) } class="button-accent">Manage Group</a>
+                        <a href={ fmt.Sprintf("/groups/%s/manage", group.ID.String()) } class="action-btn danger">Manage Group</a>
                     }
                 </div>
 				@components.Summary(balances)

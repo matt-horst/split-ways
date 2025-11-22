@@ -13,8 +13,8 @@ templ Dashboard(username string, groups []database.Group) {
         <main class="card" role="main">
             @components.Navbar(true)
             <h1>Welcome, { username }</h1>
-            <div class="dashboard-actions">
-                <a href="/create-group" class="button-accent">Create Group</a>
+            <div class="dashboard-actions actions">
+                <a href="/create-group" class="action-btn accent">Create Group</a>
             </div>
             @components.GroupsList(groups)
         </main>

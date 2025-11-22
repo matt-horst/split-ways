@@ -14,18 +14,20 @@ templ ManageGroup(group database.Group, currentUser database.User, members []dat
 				@components.Navbar(true)
 				<h1>Manage Group</h1>
 				<h2>{ group.Name }</h2>
-				<section class="members-section">
+				<section class="section">
 					<h2>Existing Members</h2>
 					<ul class="members-list">
 						for _, user := range members {
 							<li class="member-item">
-								<div class="member-avatar">
-									@components.UserIcon()
+								<div class="member-left">
+									<div class="member-avatar">
+										@components.UserIcon()
+									</div>
+									<span class="member-name">{ user.Username }</span>
 								</div>
-								<span class="member-name">{ user.Username }</span>
 								<div class="user-actions">
 									if user.ID != currentUser.ID {
-										<button class="icon-btn btn-delete" data-id={ user.ID.String() } aria-label="Delete">
+										<button class="icon-btn btn-danger" data-id={ user.ID.String() } aria-label="Delete">
 											@components.DeleteIcon()
 										</button>
 									} else {
@@ -36,27 +38,27 @@ templ ManageGroup(group database.Group, currentUser database.User, members []dat
 						}
 					</ul>
 				</section>
-				<section class="add-user-section">
+				<section class="section">
 					<h2>Add User</h2>
 					<form id="add-user-form">
 						<input id="input-username" type="text" placeholder="username" required/>
-						<button id="button-add-user" type="submit">Add</button>
+						<button class="action-btn accent" type="submit">Add</button>
 					</form>
 					@components.Status()
 				</section>
-                <section class="rename-section">
-                    <h2>Rename Group</h2>
-                    <form id="rename-group-form">
-                        <input id="input-new-name" type="text" placeholder={ group.Name } required>
-                        <button id="button-rename" type="submit">Rename</button>
-                    </form>
-                </section>
-                <section class="delete-section">
-                    <h2>Delete Group</h2>
-                    <form id="delete-group-form">
-                        <button id="button-delete" type="submit">Delete</button>
-                    </form>
-                </section>
+				<section class="section">
+					<h2>Rename Group</h2>
+					<form id="rename-group-form">
+						<input id="input-new-name" type="text" placeholder={ group.Name } required/>
+						<button class="action-btn accent" type="submit">Rename</button>
+					</form>
+				</section>
+				<section class="section">
+					<h2>Delete Group</h2>
+					<form id="delete-group-form">
+						<button class="action-btn danger" type="submit">Delete</button>
+					</form>
+				</section>
 			</main>
 			<script>
             const groupID = "{{ group.ID.String() }}"

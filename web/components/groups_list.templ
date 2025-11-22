@@ -8,18 +8,14 @@ templ GroupsList(groups []database.Group) {
     <ul class="groups-list">
         for _, group := range groups {
             <li class="group-item">
-                <div class="group-main">
+                <div class="group-left">
                     @GroupIcon()
 
-                    <span class="group-name">{ group.Name }</span>
+                    <span class="group-text">{ group.Name }</span>
                 </div>
                 <form action={"/groups/" + group.ID.String()}>
-                    <button type="submit" class="group-open-btn" aria-label="Open group">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6" />
-                        </svg>
+                    <button type="submit" class="icon-btn btn-accent" aria-label="Open group">
+                        @SelectIcon()
                     </button>
                 </form>
             </li>
